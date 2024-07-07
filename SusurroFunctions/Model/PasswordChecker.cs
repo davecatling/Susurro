@@ -14,7 +14,7 @@ namespace SusurroFunctions.Model
 
         static PasswordChecker()
         {
-            var hibpUrl = new Uri(Environment.GetEnvironmentVariable("HibpApiUrl"));
+            var hibpUrl = new Uri(Environment.GetEnvironmentVariable("HIBP_URL"));
             _httpClient = new HttpClient()
             {
                 BaseAddress = hibpUrl

@@ -1,9 +1,9 @@
-﻿
-namespace SusurroFunctions.Dtos
+﻿namespace SusurroFunctions.Dtos
 {
-    public class User
+    internal class User
     {
         public string Name { get; set; }
-        public string Password { get; set; }
+        public byte[] Salt { get; set; }
+        public byte[] PasswordHash { get; set; }
     }
 }

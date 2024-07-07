@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 using SusurroFunctions.Dtos;
 using SusurroFunctions.Model;
 using System.Text;
+using Azure.Data.Tables;
+using Azure.Identity;
 
 namespace SusurroFunctions
 {
@@ -26,7 +28,7 @@ namespace SusurroFunctions
                 var errorMsg = new StringBuilder();
                 // JSON payload of user details expected
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                var userDto = JsonConvert.DeserializeObject<User>(requestBody);
+                var userDto = JsonConvert.DeserializeObject<NewUser>(requestBody);
                 if (userDto.Name.Length == 0 || userDto.Password.Length == 0)
                     // Reject if either username or password missing
                     return new BadRequestObjectResult("Username and password are required");
@@ -38,9 +40,20 @@ namespace SusurroFunctions
                 if (hibpCount != 0)
                     errorMsg.AppendLine($"Your password appears {hibpCount} time{(hibpCount > 1 ? "s" : "")} " +
                         $"in the Have I Been Pwned database of known breaches.");
-                // Return success or error msg
+                // Return error msg if password validation failed
                 if (errorMsg.ToString().Length > 0)
                     return new BadRequestObjectResult($"{errorMsg}");
+                // Generate salt and hash password
+                var salt = HashAndSalt.GenerateSalt();
+                var passwordHash = HashAndSalt.GetHash(userDto.Password, salt);
+                // Create and store user details
+                var user = new User()
+                {
+                    Name = userDto.Name,
+                    Salt = salt,
+                    PasswordHash = passwordHash
+                };
+                TableOperations.PutUser(user);                
                 return new OkObjectResult($"Details for new user {userDto.Name} received");
             }
             catch (Exception ex)
