@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SusurroFunctions.Dtos;
 using SusurroFunctions.Model;
+using System.Text;
 
 namespace SusurroFunctions
 {
@@ -22,6 +23,7 @@ namespace SusurroFunctions
             log.LogInformation("C# HTTP trigger function processed a request.");
             try
             {
+                var errorMsg = new StringBuilder();
                 // JSON payload of user details expected
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 var userDto = JsonConvert.DeserializeObject<User>(requestBody);
@@ -29,11 +31,16 @@ namespace SusurroFunctions
                     // Reject if either username or password missing
                     return new BadRequestObjectResult("Username and password are required");
                 // Verify password for complexity and HIBP appearance
+                if (!PasswordChecker.Complexity(userDto.Password))
+                    errorMsg.AppendLine("Passwords must have at least eight characters, a mix of upper and "
+                        + "lowercase characters, special characters and numbers.");
                 var hibpCount = await PasswordChecker.HibpCount(userDto.Password);
                 if (hibpCount != 0)
-                    return new BadRequestObjectResult($"Your password appears {hibpCount} time{(hibpCount > 1 ? "s" : "")} " +
-                        $"in the Have I Been Pwned database of known breaches. Please choose another.");
-                // Return success
+                    errorMsg.AppendLine($"Your password appears {hibpCount} time{(hibpCount > 1 ? "s" : "")} " +
+                        $"in the Have I Been Pwned database of known breaches.");
+                // Return success or error msg
+                if (errorMsg.ToString().Length > 0)
+                    return new BadRequestObjectResult($"{errorMsg}");
                 return new OkObjectResult($"Details for new user {userDto.Name} received");
             }
             catch (Exception ex)

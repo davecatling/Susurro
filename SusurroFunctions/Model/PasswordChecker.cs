@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net.Http;
 using System.Security.Cryptography;
-using System.Text.Encodings.Web;
-using System.Web;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SusurroFunctions.Model
-{   
-    public static class PasswordChecker
+{
+    public static partial class PasswordChecker
     {
         private static HttpClient _httpClient;
 
@@ -21,6 +19,22 @@ namespace SusurroFunctions.Model
             {
                 BaseAddress = hibpUrl
             };
+        }
+
+        public static bool Complexity(string password)
+        {
+            // Check for password length, mix of upper and low case plus numbers
+            if (password == null) return false;
+            if (password.Length < 8) return false;
+            var regex = SpecialChars();
+            if (!regex.IsMatch(password)) return false;
+            regex = LowerCaseChars();
+            if (!regex.IsMatch(password)) return false;
+            regex = UpperCaseChars();
+            if (!regex.IsMatch(password)) return false;
+            regex = Numbers();
+            if (!regex.IsMatch(password)) return false;
+            return true;
         }
 
         public static async Task<int> HibpCount(string password)
@@ -47,5 +61,14 @@ namespace SusurroFunctions.Model
             // No match found
             return result;
         }
+
+        [GeneratedRegex(@"[\!@#$%^&*()\\[\]{}\-_+=~`|:;/""'<>,./?]")]
+        private static partial Regex SpecialChars();
+        [GeneratedRegex(@"[a-z]")]
+        private static partial Regex LowerCaseChars();
+        [GeneratedRegex(@"[A-Z]")]
+        private static partial Regex UpperCaseChars();
+        [GeneratedRegex(@"[0-9]")]
+        private static partial Regex Numbers();
     }
 }
