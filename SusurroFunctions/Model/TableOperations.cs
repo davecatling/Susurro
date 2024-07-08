@@ -2,10 +2,6 @@
 using SusurroFunctions.Dtos;
 using System;
 using Azure.Identity;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SusurroFunctions.Model
 {
@@ -13,7 +9,7 @@ namespace SusurroFunctions.Model
     {
         internal static async void PutUser(User user)
         {
-            var userEntity = new TableEntity(partitionKey: "Users", rowKey: user.Name)
+            var userEntity = new TableEntity(partitionKey: "users", rowKey: user.Name)
             {
                 { "Salt", user.Salt },
                 { "PasswordHash", user.PasswordHash }
@@ -24,7 +20,7 @@ namespace SusurroFunctions.Model
 
         internal static TableClient TableClient()
         {
-            var clientId = "4af8231f-41c5-4283-8583-22074bad5993";
+            var clientId = Environment.GetEnvironmentVariable("MI_CLIENT_ID");
             return new TableClient(new Uri(Environment.GetEnvironmentVariable("STORAGE_ENDPOINT")),
                 "susurrotable", 
                 new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = clientId}));
