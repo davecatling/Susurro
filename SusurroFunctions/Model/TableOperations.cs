@@ -2,6 +2,10 @@
 using SusurroFunctions.Dtos;
 using System;
 using Azure.Identity;
+using Azure;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Linq;
 
 namespace SusurroFunctions.Model
 {
@@ -16,6 +20,14 @@ namespace SusurroFunctions.Model
             };
             var tableClient = TableClient();
             await tableClient.UpsertEntityAsync(userEntity);
+        }
+
+        internal static bool UserExists(string username)
+        {
+            var tableClient = TableClient();
+            Pageable<TableEntity> queryResults = tableClient.Query<TableEntity>(filter: (e) => e.PartitionKey == "users"
+                && e.RowKey == username);
+            return queryResults.Any();            
         }
 
         internal static TableClient TableClient()

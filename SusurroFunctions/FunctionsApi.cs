@@ -24,14 +24,17 @@ namespace SusurroFunctions
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             try
-            {
+            {                
                 var errorMsg = new StringBuilder();
                 // JSON payload of user details expected
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 var userDto = JsonConvert.DeserializeObject<NewUser>(requestBody);
-                if (userDto.Name.Length == 0 || userDto.Password.Length == 0)
+                if (userDto.Name?.Length == 0 || userDto.Password?.Length == 0)
                     // Reject if either username or password missing
                     return new BadRequestObjectResult("Username and password are required");
+                // Return if user already exists
+                if (TableOperations.UserExists(userDto.Name))
+                    return new BadRequestObjectResult($"Username {userDto.Name} is not available");
                 // Verify password for complexity and HIBP appearance
                 if (!PasswordChecker.Complexity(userDto.Password))
                     errorMsg.AppendLine("Passwords must have at least eight characters, a mix of upper and "
