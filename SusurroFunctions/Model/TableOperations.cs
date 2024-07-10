@@ -3,8 +3,6 @@ using SusurroFunctions.Dtos;
 using System;
 using Azure.Identity;
 using Azure;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Linq;
 
 namespace SusurroFunctions.Model
