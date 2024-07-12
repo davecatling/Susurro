@@ -6,7 +6,7 @@ namespace SusurroTestConsole
 {
     internal class TestConsole
     {
-        private Http? _http;
+        private Comms? _http;
 
         internal void Startup()
         {
@@ -16,7 +16,7 @@ namespace SusurroTestConsole
 
             builder.Configuration.AddJsonFile("appsettings.json", false);
 
-            _http = new Http();
+            _http = new Comms();
             builder.Configuration.GetSection("Http").Bind(_http);
 
             var command = string.Empty;

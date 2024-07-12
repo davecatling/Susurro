@@ -1,4 +1,4 @@
-﻿namespace SusurroHttp.Dtos
+﻿namespace SusurroDtos
 {
     public class NewUser
     {

@@ -9,7 +9,7 @@ namespace SusurroFunctions.Model
 {
     internal static class TableOperations
     {
-        internal static async void PutUser(User user)
+        internal static async void PutUser(UserDto user)
         {
             var userEntity = new TableEntity(partitionKey: "users", rowKey: user.Name)
             {
@@ -20,11 +20,36 @@ namespace SusurroFunctions.Model
             await tableClient.UpsertEntityAsync(userEntity);
         }
 
-        internal static bool UserExists(string username)
+        internal static string GetPublicKey(string name)
+        {
+            var queryResults = GetUser(name);
+            if (!queryResults.Any())
+                return null;
+            return queryResults.First().GetString("PublicKey");
+        }
+
+        internal static bool PutPublicKey(string name, string publicKey)
+        {
+            var queryResults = GetUser(name);
+            if (!queryResults.Any()) return false;
+            queryResults.First().GetString("PublicKey");
+            if (publicKey != null) return false;
+            var tableClient = TableClient();
+            tableClient.UpsertEntity(queryResults.First());
+            return true;
+        }
+
+        private static Pageable<TableEntity> GetUser(string name)
         {
             var tableClient = TableClient();
             Pageable<TableEntity> queryResults = tableClient.Query<TableEntity>(filter: (e) => e.PartitionKey == "users"
-                && e.RowKey == username);
+                && e.RowKey == name);
+            return queryResults;
+        }
+
+        internal static bool UserExists(string name)
+        {
+            var queryResults = GetUser(name);
             return queryResults.Any();            
         }
 

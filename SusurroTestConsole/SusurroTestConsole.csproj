@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SusurroHttp\SusurroHttp.csproj" />
+    <ProjectReference Include="..\SusurroHttp\SusurroComms.csproj" />
   </ItemGroup>
 
   <ItemGroup>

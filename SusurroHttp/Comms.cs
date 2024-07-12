@@ -1,9 +1,9 @@
 ﻿namespace SusurroHttp
 {
-    using Dtos;
+    using SusurroDtos;
     using System.Net.Http.Json;
 
-    public class Http
+    public class Comms : IComms
     {
         private HttpClient? _httpClient;
 
@@ -14,17 +14,23 @@
             get
             {
                 _httpClient ??= new HttpClient
-                    {
-                        BaseAddress = new Uri(BaseUrl!)
-                    };
+                {
+                    BaseAddress = new Uri(BaseUrl!)
+                };
                 return _httpClient;
             }
         }
-        
+
         public async Task<HttpResponseMessage> CreateUserAsync(string name, string password)
         {
             var newUserDto = new NewUser() { Name = name, Password = password };
             var result = await HttpClient.PostAsJsonAsync<NewUser>($"{HttpClient.BaseAddress}CreateUser", newUserDto);
+            return result;
+        }
+
+        public async Task<string> GetKeyAsync(string name)
+        {
+            var result = await HttpClient.GetStringAsync($"{HttpClient.BaseAddress}GetKey?name={name}");
             return result;
         }
     }
