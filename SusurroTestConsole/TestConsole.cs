@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using SusurroHttp;
+using SusurroRsa;
 
 namespace SusurroTestConsole
 {
     internal class TestConsole
     {
-        private Comms? _http;
+        private Http? _http;
 
         internal void Startup()
         {
@@ -16,7 +17,7 @@ namespace SusurroTestConsole
 
             builder.Configuration.AddJsonFile("appsettings.json", false);
 
-            _http = new Comms();
+            _http = new Http();
             builder.Configuration.GetSection("Http").Bind(_http);
 
             var command = string.Empty;
@@ -45,9 +46,22 @@ namespace SusurroTestConsole
                 Console.WriteLine("Expected: createuser <name> <password>");
                 return;
             }
-            var result = await _http!.CreateUserAsync(elements[1], elements[2]);
-            Console.WriteLine(result.IsSuccessStatusCode ? "Success!" : "Failed!");
-            Console.WriteLine(await result.Content.ReadAsStringAsync());
+            var username = elements[1];
+            var password = elements[2];
+            var initialCallResult = await _http!.CreateUserAsync(username, password);
+            if (initialCallResult.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"New user {username} created. Generating keys...");
+                var rsa = new Rsa(_http);
+                var paths = rsa.CreateKeys(username, password);
+                Console.WriteLine($"New keys created. Key paths:\n{paths[0]}\n{paths[1]}");
+            }
+            else
+            {
+                Console.WriteLine("Creating user failed. Error msg:");
+                using var streamReader = new StreamReader(initialCallResult.Content.ReadAsStream());
+                Console.WriteLine(streamReader.ReadToEnd());
+            }
         }
     }
 }

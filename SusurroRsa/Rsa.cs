@@ -1,5 +1,6 @@
-﻿using System.Runtime.InteropServices;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using SusurroHttp;
 
 namespace SusurroRsa
 {
@@ -7,9 +8,12 @@ namespace SusurroRsa
     {
         private IComms _comms;
 
-        public Rsa() { }
+        public Rsa(IComms comms)
+        {
+            _comms = comms;        
+        }
 
-        private static RSACryptoServiceProvider NewRsa()
+        private RSACryptoServiceProvider NewRsa()
         {
             RSACryptoServiceProvider rsa = new()
             {
@@ -18,20 +22,21 @@ namespace SusurroRsa
             return rsa;
         }
 
-        private static string PublicKeyPath(string username)
+        private string PublicKeyPath(string username)
         {
-            var path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"\keys");
+            var path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"\Susurro\keys");
             Directory.CreateDirectory(path);
-            path = Path.Join(path, $"{username}:public.xml");
+            path = Path.Join(path, $"{username}-public.xml");
             return path;
         }
 
-        public static string PrivateKeyPath(string username)
+        public string PrivateKeyPath(string username)
         {
             var path = PublicKeyPath(username);
-            return path[..10] + "private.p8";
+            path = string.Concat(path.AsSpan(0, path.Length - 10), "private.p8");
+            return path;
         }
-        public static string[] CreateKeys(string username, string password, bool overwrite = false)
+        public string[] CreateKeys(string username, string password, bool overwrite = false)
         {
             var result = new string[2];
             var privatePath = PrivateKeyPath(username);
@@ -51,7 +56,7 @@ namespace SusurroRsa
             return result;
         }
 
-        private static RSACryptoServiceProvider PublicRsa(string username)
+        private async Task<RSACryptoServiceProvider> PublicRsaAsync(string username)
         {
             string publicKeyXml;
             var path = PublicKeyPath(username);
@@ -62,14 +67,16 @@ namespace SusurroRsa
             }
             else
             {
-
+                publicKeyXml = await _comms.GetKeyAsync(username);
+                using StreamWriter streamWriter = new(File.Open(path, FileMode.Create));
+                streamWriter.Write(publicKeyXml);
             }
             var rsa = NewRsa();
             rsa.FromXmlString(publicKeyXml);
             return rsa;
         }
 
-        private static RSACryptoServiceProvider PrivateRsa(string username, string password)
+        private RSACryptoServiceProvider PrivateRsa(string username, string password)
         {
             var path = PrivateKeyPath(username);
             if (!File.Exists(path))

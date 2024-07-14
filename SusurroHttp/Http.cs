@@ -3,7 +3,7 @@
     using SusurroDtos;
     using System.Net.Http.Json;
 
-    public class Comms : IComms
+    public class Http : IComms
     {
         private HttpClient? _httpClient;
 
