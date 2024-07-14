@@ -21,6 +21,8 @@ namespace SusurroFunctions
             log.LogInformation("C# HTTP trigger function processed a request.");
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var putKeyDto = JsonConvert.DeserializeObject<PutKeyDto>(requestBody);
+            if (!TableOperations.PasswordOk(putKeyDto.Name, putKeyDto.Password))
+                return new BadRequestObjectResult($"Put key failure.");
             var result = TableOperations.PutPublicKey(putKeyDto.Name, putKeyDto.Key);
             if (!result)
                 return new BadRequestObjectResult($"Put key failure.");

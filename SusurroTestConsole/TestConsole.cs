@@ -48,11 +48,11 @@ namespace SusurroTestConsole
             }
             var username = elements[1];
             var password = elements[2];
+            var rsa = new Rsa(_http!);
             var initialCallResult = await _http!.CreateUserAsync(username, password);
             if (initialCallResult.IsSuccessStatusCode)
             {
                 Console.WriteLine($"New user {username} created. Generating keys...");
-                var rsa = new Rsa(_http);
                 var paths = rsa.CreateKeys(username, password);
                 Console.WriteLine($"New keys created. Key paths:\n{paths[0]}\n{paths[1]}");
             }
@@ -61,6 +61,19 @@ namespace SusurroTestConsole
                 Console.WriteLine("Creating user failed. Error msg:");
                 using var streamReader = new StreamReader(initialCallResult.Content.ReadAsStream());
                 Console.WriteLine(streamReader.ReadToEnd());
+                return;
+            }
+            Console.WriteLine("Uploading public key...");
+            var publicRsa = await rsa.PublicRsaAsync(username);
+            var uploadResult = await _http.PutKeyAsync(username, password, publicRsa.ToXmlString(false));
+            if (uploadResult.IsSuccessStatusCode)            
+                Console.WriteLine($"Private key uploaded.");
+            else
+            {
+                Console.WriteLine("Uploading key failed. Error msg:");
+                using var streamReader = new StreamReader(uploadResult.Content.ReadAsStream());
+                Console.WriteLine(streamReader.ReadToEnd());
+                return;
             }
         }
     }

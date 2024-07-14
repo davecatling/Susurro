@@ -4,6 +4,8 @@ using System;
 using Azure.Identity;
 using Azure;
 using System.Linq;
+using System.Text;
+using System.Collections.Generic;
 
 namespace SusurroFunctions.Model
 {
@@ -22,37 +24,47 @@ namespace SusurroFunctions.Model
 
         internal static string GetPublicKey(string name)
         {
-            var queryResults = GetUser(name);
-            if (!queryResults.Any())
-                return null;
-            return queryResults.First().GetString("PublicKey");
+            var user = GetUser(name);
+            if (user == null) return null;
+            return user.GetString("PublicKey");
         }
 
         internal static bool PutPublicKey(string name, string publicKey)
         {
-            var queryResults = GetUser(name);
-            if (!queryResults.Any()) return false;
-            queryResults.First().GetString("PublicKey");
-            if (publicKey != null) return false;
+            var user = GetUser(name);
+            if (user == null) return false;
+            if (user.GetString("PublicKey") != null) return false;
+            user.Add("PublicKey", publicKey);
             var tableClient = TableClient();
-            tableClient.UpsertEntity(queryResults.First());
+            tableClient.UpsertEntity(user);
             return true;
         }
 
-        private static Pageable<TableEntity> GetUser(string name)
+        private static TableEntity GetUser(string name)
         {
             var tableClient = TableClient();
             Pageable<TableEntity> queryResults = tableClient.Query<TableEntity>(filter: (e) => e.PartitionKey == "users"
                 && e.RowKey == name);
-            return queryResults;
+            if (!queryResults.Any()) return null;
+            return queryResults.First();
         }
 
         internal static bool UserExists(string name)
         {
             var queryResults = GetUser(name);
-            return queryResults.Any();            
+            return queryResults != null;            
         }
 
+        internal static bool PasswordOk(string name, string password)
+        {
+            var user = GetUser(name);
+            if (user == null) return false;
+            var salt = user.GetBinary("Salt");
+            var hashedPassword = HashAndSalt.GetHash(password, salt);
+            var storedPassword = user.GetBinary("PasswordHash");
+            return hashedPassword.SequenceEqual(storedPassword);
+        }
+        
         internal static TableClient TableClient()
         {
             var clientId = Environment.GetEnvironmentVariable("MI_CLIENT_ID");

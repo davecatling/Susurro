@@ -24,13 +24,22 @@
         public async Task<HttpResponseMessage> CreateUserAsync(string name, string password)
         {
             var newUserDto = new NewUser() { Name = name, Password = password };
-            var result = await HttpClient.PostAsJsonAsync<NewUser>($"{HttpClient.BaseAddress}CreateUser", newUserDto);
+            var result = await HttpClient.PostAsJsonAsync<NewUser>($"{HttpClient.BaseAddress}CreateUser", 
+                newUserDto);
             return result;
         }
 
         public async Task<string> GetKeyAsync(string name)
         {
             var result = await HttpClient.GetStringAsync($"{HttpClient.BaseAddress}GetKey?name={name}");
+            return result;
+        }
+
+        public async Task<HttpResponseMessage> PutKeyAsync(string name, string password, string key)
+        {
+            var putKeyDto = new PutKeyDto() { Name = name, Password = password, Key = key };
+            var result = await HttpClient.PostAsJsonAsync<PutKeyDto>($"{HttpClient.BaseAddress}PutKey",
+                putKeyDto);
             return result;
         }
     }

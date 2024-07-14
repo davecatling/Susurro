@@ -56,7 +56,7 @@ namespace SusurroRsa
             return result;
         }
 
-        private async Task<RSACryptoServiceProvider> PublicRsaAsync(string username)
+        public async Task<RSACryptoServiceProvider> PublicRsaAsync(string username)
         {
             string publicKeyXml;
             var path = PublicKeyPath(username);
