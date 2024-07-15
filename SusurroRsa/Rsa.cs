@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using SusurroHttp;
 
 namespace SusurroRsa
@@ -10,7 +11,7 @@ namespace SusurroRsa
 
         public Rsa(IComms comms)
         {
-            _comms = comms;        
+            _comms = comms;
         }
 
         private RSACryptoServiceProvider NewRsa()
@@ -36,6 +37,7 @@ namespace SusurroRsa
             path = string.Concat(path.AsSpan(0, path.Length - 10), "private.p8");
             return path;
         }
+
         public string[] CreateKeys(string username, string password, bool overwrite = false)
         {
             var result = new string[2];
@@ -44,7 +46,7 @@ namespace SusurroRsa
                 throw new IOException($"Existing file at {privatePath}");
             RSACryptoServiceProvider rsa = NewRsa();
             var keys = rsa.ExportEncryptedPkcs8PrivateKey((ReadOnlySpan<char>)password,
-                new PbeParameters(PbeEncryptionAlgorithm.Aes256Cbc, HashAlgorithmName.SHA256, 500000)); 
+                new PbeParameters(PbeEncryptionAlgorithm.Aes256Cbc, HashAlgorithmName.SHA256, 500000));
             using BinaryWriter binaryWriter = new(File.Open(privatePath, FileMode.Create));
             binaryWriter.Write(keys);
             result[0] = privatePath;
@@ -98,11 +100,29 @@ namespace SusurroRsa
             return rsa;
         }
 
+        public async Task<byte[]> EncryptAsync(string plainString, string to)
+        {
+            byte[] encryptedBytes;
+            using (var rsa = await PublicRsaAsync(to))
+            {
+                var plainBytes = Encoding.UTF8.GetBytes(plainString);
+                encryptedBytes = rsa.Encrypt(plainBytes, true);
+            }
+            return encryptedBytes;
+        }
 
+        public byte[] Sign(string plain, string from, string password)
+        {
+            var hashData = SHA1.HashData(Encoding.UTF8.GetBytes(plain));
+            using var rsa = PrivateRsa(from, password);
+            return rsa.SignData(hashData, SHA256.Create());
+        }
 
-
-
-
-
+        public async Task<bool> SignatureOkAsync(byte[] signature, string plain, string from)
+        {
+            var expectedBytes = SHA1.HashData(Encoding.UTF8.GetBytes(plain));
+            using var rsa = await PublicRsaAsync(from);
+            return rsa.VerifyData(signature, SHA256.Create(), expectedBytes);
+        }
     }
 }

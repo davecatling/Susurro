@@ -1,9 +1,11 @@
 ﻿using Azure;
 using Azure.Data.Tables;
 using Azure.Identity;
-using SusurroFunctions.Dtos;
+using SusurroDtos;
 using System;
 using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SusurroFunctions.Model
 {
@@ -36,6 +38,28 @@ namespace SusurroFunctions.Model
             var tableClient = TableClient();
             tableClient.UpsertEntity(user);
             return true;
+        }
+
+        internal async static Task<List<MessageDto>> PutMessagesAsync(List<MessageDto> messages)
+        {
+            var result = new List<MessageDto>();
+            var tableClient = TableClient();
+            foreach (MessageDto message in messages)
+            {
+                var id = Guid.NewGuid().ToString();
+                var msgEntity = new TableEntity(partitionKey: "msgs", rowKey: id)
+                {
+                    { "From", message.From },
+                    { "To", message.To },
+                    { "Text", message.Text },
+                    { "Signature", message.Signature },
+                    { "Created", DateTime.UtcNow }
+                };
+                message.Id = id;
+                await tableClient.UpsertEntityAsync(msgEntity);
+                result.Add(message);
+            }
+            return result;
         }
 
         private static TableEntity GetUser(string name)

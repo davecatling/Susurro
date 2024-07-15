@@ -1,10 +1,6 @@
-﻿using Azure;
-using Azure.Data.Tables;
-using System;
-
-namespace SusurroFunctions.Dtos
+﻿namespace SusurroDtos
 {
-    internal class UserDto
+    public class UserDto
     {
         public string Name { get; set; }
         public byte[] Salt { get; set; }

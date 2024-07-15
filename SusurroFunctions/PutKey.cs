@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SusurroFunctions.Model;
-using SusurroFunctions.Dtos;
+using SusurroDtos;
 namespace SusurroFunctions
 {
     public static class PutKey

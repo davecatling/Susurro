@@ -24,8 +24,8 @@
 
         public async Task<HttpResponseMessage> CreateUserAsync(string name, string password)
         {
-            var newUserDto = new NewUser() { Name = name, Password = password };
-            var result = await HttpClient.PostAsJsonAsync<NewUser>($"{HttpClient.BaseAddress}CreateUser", 
+            var newUserDto = new NewUserDto() { Name = name, Password = password };
+            var result = await HttpClient.PostAsJsonAsync<NewUserDto>($"{HttpClient.BaseAddress}CreateUser", 
                 newUserDto);
             return result;
         }
@@ -48,7 +48,15 @@
         {
             HttpResponseMessage result;
             result = await HttpClient.GetAsync(
-                    $"{HttpClient.BaseAddress}Login?name={name}&password={password}");
+                    $"{HttpClient.BaseAddress}Login?name={name}&password={password}");            
+            return result;       
+        }
+
+        public async Task<HttpResponseMessage> SendMsgAsync(List<MessageDto> messages)
+        {
+            HttpResponseMessage result;
+            result = await HttpClient.PostAsJsonAsync(
+                $"{HttpClient.BaseAddress}SendMsg", messages);
             return result;
         }
 

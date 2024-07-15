@@ -7,11 +7,9 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SusurroFunctions.Dtos;
+using SusurroDtos;
 using SusurroFunctions.Model;
 using System.Text;
-using Azure.Data.Tables;
-using Azure.Identity;
 
 namespace SusurroFunctions
 {

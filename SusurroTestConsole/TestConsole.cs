@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using SusurroHttp;
 using SusurroRsa;
+using SusurroDtos;
 using System.Security.Cryptography;
+using System.Net.Http.Json;
 
 namespace SusurroTestConsole
 {
@@ -48,7 +50,71 @@ namespace SusurroTestConsole
                             Login(elements); 
                             break;
                         }
+                    case "sendmsg":
+                        {
+                            SendMsgAsync(elements); 
+                            break;
+                        }
                 }
+            }
+        }
+
+        internal async void SendMsgAsync(string[] elements)
+        {
+            if (elements.Length < 2)
+            {
+                Console.WriteLine("Expected: sendmsg <recipient1name> <recipient2name>...");
+                return;
+            }
+            if (_username == null)
+            {
+                Console.WriteLine("No logged in user. Please log in and try again.");
+                return;
+            }
+            Console.WriteLine("Enter message text:");
+            var plainText = Console.ReadLine();
+            var messages = new List<MessageDto>();
+            bool exceptionOccured = false;
+            var rsa = new Rsa(_http!);
+            for (var i = 1; i < elements.Length; i++)
+            {
+                var to = elements[i];
+                byte[]? cypherText = null;
+                byte[]? signature = null;
+                try
+                {
+                    cypherText = await rsa.EncryptAsync(plainText!, to);
+                    signature = rsa.Sign(plainText!, _username, _password);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Sending failed for user {to}: {ex.Message}");
+                    exceptionOccured = true;
+                }
+                if (!exceptionOccured)
+                {
+                    messages.Add(new MessageDto()
+                    {
+                        From = _username,
+                        Password = _password,
+                        To = to,
+                        Text = cypherText!,
+                        Signature = signature!
+                    });
+                }
+            }
+            var result = await _http!.SendMsgAsync(messages);
+            if (result.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Message sent. Repcipient message IDs:");
+                var sendResults = await result.Content.ReadFromJsonAsync<List<SendResult>>();
+                foreach (var item in sendResults!)
+                    Console.WriteLine($"{item.To}: {item.Id}");
+            }
+            else
+            {
+                var errorText = await result.Content.ReadAsStringAsync();
+                Console.WriteLine($"Sending message failed: {errorText}");
             }
         }
 
