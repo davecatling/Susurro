@@ -55,8 +55,24 @@ namespace SusurroTestConsole
                             SendMsgAsync(elements); 
                             break;
                         }
+                    case "getmsg":
+                        {
+                            GetMsgAsync(elements); 
+                            break;
+                        }
                 }
             }
+        }
+
+        internal async void GetMsgAsync(string[] elements)
+        {
+            if (elements.Length < 2)
+            {
+                Console.WriteLine("Expected: getmsg <msgId>");
+                return;
+            }
+            var msgDto = await _http!.GetMsgAsync(elements[1], _password);
+            Console.WriteLine(msgDto.Id);
         }
 
         internal async void SendMsgAsync(string[] elements)

@@ -44,6 +44,21 @@
             return result;
         }
 
+        public async Task<MessageDto> GetMsgAsync(string id, string password)
+        {
+            HttpResponseMessage result;
+            result = await HttpClient.GetAsync(
+                $"{HttpClient.BaseAddress}GetMsg?id={id}&password={password}");
+            if (!result.IsSuccessStatusCode)
+            {
+                var response = await result.Content.ReadAsStringAsync();
+                throw new Exception($"{result.StatusCode}: {response}");
+            }
+            var msg = await result.Content.ReadFromJsonAsync<MessageDto>() 
+                ?? throw new Exception("Failed to rehydrate message.");
+            return msg;
+        }
+
         public async Task<HttpResponseMessage> Login(string name, string password)
         {
             HttpResponseMessage result;

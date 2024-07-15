@@ -65,8 +65,17 @@ namespace SusurroFunctions.Model
         private static TableEntity GetUser(string name)
         {
             var tableClient = TableClient();
-            Pageable<TableEntity> queryResults = tableClient.Query<TableEntity>(filter: (e) => e.PartitionKey == "users"
-                && e.RowKey == name);
+            Pageable<TableEntity> queryResults = tableClient.Query<TableEntity>(filter: (e) => 
+                e.PartitionKey == "users" && e.RowKey == name);
+            if (!queryResults.Any()) return null;
+            return queryResults.First();
+        }
+
+        internal static TableEntity GetMsg(string id)
+        {
+            var tableClient = TableClient();
+            Pageable<TableEntity> queryResults = tableClient.Query<TableEntity>(filter: (e) => 
+                e.PartitionKey == "msgs" && e.RowKey == id);
             if (!queryResults.Any()) return null;
             return queryResults.First();
         }
