@@ -1,11 +1,9 @@
-﻿using Azure.Data.Tables;
+﻿using Azure;
+using Azure.Data.Tables;
+using Azure.Identity;
 using SusurroFunctions.Dtos;
 using System;
-using Azure.Identity;
-using Azure;
 using System.Linq;
-using System.Text;
-using System.Collections.Generic;
 
 namespace SusurroFunctions.Model
 {
@@ -59,12 +57,41 @@ namespace SusurroFunctions.Model
         {
             var user = GetUser(name);
             if (user == null) return false;
+            return PasswordOk(user, password);
+        }
+        
+        internal static bool PasswordOk(TableEntity user, string password)
+        {
             var salt = user.GetBinary("Salt");
             var hashedPassword = HashAndSalt.GetHash(password, salt);
             var storedPassword = user.GetBinary("PasswordHash");
             return hashedPassword.SequenceEqual(storedPassword);
         }
-        
+
+        internal static bool Login(string name, string password)
+        {
+            var user = GetUser(name);
+            if (user == null) return false;
+            var lastFailed = user.GetDateTime("LoginFail");
+            if (lastFailed != null)
+            {
+                if (DateTime.UtcNow.Subtract((DateTime)lastFailed).TotalMinutes < 1)
+                    return false;
+            }
+            var result = PasswordOk(user, password);
+            if (result)
+            {
+                user.Add("LoginOk", DateTime.UtcNow);
+            }
+            else
+            {
+                user.Add("LoginFail", DateTime.UtcNow);
+            }
+            var tableClient = TableClient();
+            tableClient.UpsertEntity(user);
+            return result;
+        }
+
         internal static TableClient TableClient()
         {
             var clientId = Environment.GetEnvironmentVariable("MI_CLIENT_ID");

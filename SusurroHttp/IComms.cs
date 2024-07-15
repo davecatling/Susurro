@@ -9,5 +9,6 @@ namespace SusurroHttp
         Task<HttpResponseMessage> CreateUserAsync(string name, string password);
         Task<string> GetKeyAsync(string name);
         Task<HttpResponseMessage> PutKeyAsync(string name, string password, string key);
+        Task<HttpResponseMessage> Login(string username, string password);
     }
 }

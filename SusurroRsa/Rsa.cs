@@ -67,7 +67,14 @@ namespace SusurroRsa
             }
             else
             {
-                publicKeyXml = await _comms.GetKeyAsync(username);
+                try
+                {
+                    publicKeyXml = await _comms.GetKeyAsync(username);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
                 using StreamWriter streamWriter = new(File.Open(path, FileMode.Create));
                 streamWriter.Write(publicKeyXml);
             }

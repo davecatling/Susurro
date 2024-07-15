@@ -2,6 +2,7 @@
 {
     using SusurroDtos;
     using System.Net.Http.Json;
+    using System.Xml.Linq;
 
     public class Http : IComms
     {
@@ -31,7 +32,23 @@
 
         public async Task<string> GetKeyAsync(string name)
         {
-            var result = await HttpClient.GetStringAsync($"{HttpClient.BaseAddress}GetKey?name={name}");
+            string result;
+            try
+            {
+                result = await HttpClient.GetStringAsync($"{HttpClient.BaseAddress}GetKey?name={name}");
+            }
+            catch (HttpRequestException ex) 
+            {
+                result = ex.Message;
+            }
+            return result;
+        }
+
+        public async Task<HttpResponseMessage> Login(string name, string password)
+        {
+            HttpResponseMessage result;
+            result = await HttpClient.GetAsync(
+                    $"{HttpClient.BaseAddress}Login?name={name}&password={password}");
             return result;
         }
 
