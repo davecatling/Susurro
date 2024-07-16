@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.ComponentModel;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using SusurroHttp;
@@ -111,18 +112,28 @@ namespace SusurroRsa
             return encryptedBytes;
         }
 
+        public string Decrypt(byte[] encryptedBytes, string username, string password)
+        {
+            byte[] decryptedBytes;
+            using (var rsa = PrivateRsa(username, password))
+            {
+                decryptedBytes = rsa.Decrypt(encryptedBytes, true);
+            }
+            return UnicodeEncoding.UTF8.GetString(decryptedBytes);
+        }
+
         public byte[] Sign(string plain, string from, string password)
         {
-            var hashData = SHA1.HashData(Encoding.UTF8.GetBytes(plain));
+            var plainBytes = Encoding.UTF8.GetBytes(plain);
             using var rsa = PrivateRsa(from, password);
-            return rsa.SignData(hashData, SHA256.Create());
+            return rsa.SignData(plainBytes, SHA256.Create());
         }
 
         public async Task<bool> SignatureOkAsync(byte[] signature, string plain, string from)
         {
-            var expectedBytes = SHA1.HashData(Encoding.UTF8.GetBytes(plain));
+            var plainBytes = Encoding.UTF8.GetBytes(plain);
             using var rsa = await PublicRsaAsync(from);
-            return rsa.VerifyData(signature, SHA256.Create(), expectedBytes);
+            return rsa.VerifyData(plainBytes, SHA256.Create(), signature!);
         }
     }
 }

@@ -80,6 +80,12 @@ namespace SusurroFunctions.Model
             return queryResults.First();
         }
 
+        internal static void DeleteMsg(string id)
+        {            
+            var tableClient = TableClient();
+            tableClient.DeleteEntity("msgs", id);
+        }
+
         internal static bool UserExists(string name)
         {
             var queryResults = GetUser(name);

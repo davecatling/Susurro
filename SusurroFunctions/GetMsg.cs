@@ -41,6 +41,7 @@ namespace SusurroFunctions
                 Text = msg.GetBinary("Text"),
                 Signature = msg.GetBinary("Signature")
             };
+            TableOperations.DeleteMsg(msg.RowKey);
             return new OkObjectResult(msgDto);
         }
     }

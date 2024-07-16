@@ -72,7 +72,15 @@ namespace SusurroTestConsole
                 return;
             }
             var msgDto = await _http!.GetMsgAsync(elements[1], _password);
-            Console.WriteLine(msgDto.Id);
+            var rsa = new Rsa(_http!);
+            var msgText = rsa.Decrypt(msgDto.Text, _username, _password);
+            var signatureOk = await rsa.SignatureOkAsync(msgDto.Signature, msgText, msgDto.From);
+            if (!signatureOk)
+            {
+                Console.WriteLine("Message signature check failed!");
+                return;
+            }
+            Console.WriteLine(msgText);
         }
 
         internal async void SendMsgAsync(string[] elements)
