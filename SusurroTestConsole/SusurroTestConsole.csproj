@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SusurroHttp\SusurroComms.csproj" />
     <ProjectReference Include="..\SusurroRsa\SusurroRsa.csproj" />
+    <ProjectReference Include="..\SusurroSignalR\SusurroSignalR.csproj" />
   </ItemGroup>
 
   <ItemGroup>

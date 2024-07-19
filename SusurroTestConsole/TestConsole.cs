@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using SusurroHttp;
 using SusurroRsa;
 using SusurroDtos;
+using SusurroSignalR;
 using System.Security.Cryptography;
 using System.Net.Http.Json;
 
@@ -11,6 +12,7 @@ namespace SusurroTestConsole
     internal class TestConsole
     {
         private Http? _http;
+        private SignalR? _signalR;
         private string _username;
         private string _password;
 
@@ -23,7 +25,9 @@ namespace SusurroTestConsole
             builder.Configuration.AddJsonFile("appsettings.json", false);
 
             _http = new Http();
+            _signalR = new SignalR();
             builder.Configuration.GetSection("Http").Bind(_http);
+            builder.Configuration.GetSection("SignalR").Bind(_signalR);
 
             var command = string.Empty;
 
@@ -130,7 +134,7 @@ namespace SusurroTestConsole
             var result = await _http!.SendMsgAsync(messages);
             if (result.IsSuccessStatusCode)
             {
-                Console.WriteLine("Message sent. Repcipient message IDs:");
+                Console.WriteLine("Message sent. Recipient message IDs:");
                 var sendResults = await result.Content.ReadFromJsonAsync<List<SendResult>>();
                 foreach (var item in sendResults!)
                     Console.WriteLine($"{item.To}: {item.Id}");
@@ -157,6 +161,7 @@ namespace SusurroTestConsole
                 Console.WriteLine($"User {name} logged in.");
                 _username = name;
                 _password = password;
+                _signalR!.ConnectAsync();
             }
             else
             {
