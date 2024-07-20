@@ -11,22 +11,22 @@ using SusurroFunctions.Model;
 using SusurroDtos;
 namespace SusurroFunctions
 {
-    public static class PutKey
+    public static class PutConId
     {
-        [FunctionName("PutKey")]
+        [FunctionName("PutConId")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var putKeyDto = JsonConvert.DeserializeObject<PutStringDto>(requestBody);
-            if (!TableOperations.PasswordOk(putKeyDto.Name, putKeyDto.Password))
-                return new BadRequestObjectResult($"Put key failure.");
-            var result = TableOperations.PutPublicKey(putKeyDto.Name, putKeyDto.Value);
+            var putStringDto = JsonConvert.DeserializeObject<PutStringDto>(requestBody);
+            if (!TableOperations.PasswordOk(putStringDto.Name, putStringDto.Password))
+                return new BadRequestObjectResult($"Put connection ID failure.");
+            var result = TableOperations.PutConId(putStringDto.Name, putStringDto.Value);
             if (!result)
-                return new BadRequestObjectResult($"Put key failure.");
-            return new OkObjectResult("Put key success.");
+                return new BadRequestObjectResult($"Put connection ID failure.");
+            return new OkObjectResult("Put connection ID success.");
         }
     }
 }

@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace CSharp
 {
-    public static class Function
+    public static class SignalrNegotiate
     {
 
         [FunctionName("Negotiate")]
@@ -22,5 +22,7 @@ namespace CSharp
         {
             return connectionInfo;
         }
+
+
     }
 }

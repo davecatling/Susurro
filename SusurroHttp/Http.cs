@@ -77,10 +77,19 @@
 
         public async Task<HttpResponseMessage> PutKeyAsync(string name, string password, string key)
         {
-            var putKeyDto = new PutKeyDto() { Name = name, Password = password, Key = key };
-            var result = await HttpClient.PostAsJsonAsync<PutKeyDto>($"{HttpClient.BaseAddress}PutKey",
-                putKeyDto);
+            var putValueDto = new PutStringDto() { Name = name, Password = password, Value = key };
+            var result = await HttpClient.PostAsJsonAsync<PutStringDto>($"{HttpClient.BaseAddress}PutKey",
+                putValueDto);
             return result;
         }
+
+        public async Task<HttpResponseMessage> PutConIdAsync(string name, string password, string conId)
+        {
+            var putValueDto = new PutStringDto() { Name = name, Password = password, Value = conId };
+            var result = await HttpClient.PostAsJsonAsync<PutStringDto>($"{HttpClient.BaseAddress}PutConId",
+                putValueDto);
+            return result;
+        }
+
     }
 }

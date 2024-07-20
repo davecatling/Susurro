@@ -13,6 +13,8 @@ using SusurroFunctions.Model;
 using System.Text;
 using Azure.Data.Tables;
 using Azure.Identity;
+using Microsoft.Azure.WebJobs.Extensions.SignalRService;
+using System.Security.Principal;
 
 namespace SusurroFunctions
 {
@@ -21,6 +23,7 @@ namespace SusurroFunctions
         [FunctionName("SendMsg")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            [SignalR(HubName = "serverless")] IAsyncCollector<SignalRMessage> signalRMessages,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -42,6 +45,12 @@ namespace SusurroFunctions
                         To = msg.To
                     });
                 }
+                await signalRMessages.AddAsync(
+                    new SignalRMessage
+                    {
+                        Target = "newMessage",
+                        Arguments = [.. sendMsgResults]
+                    });
                 return new OkObjectResult(sendMsgResults);
             }
             catch (Exception ex)

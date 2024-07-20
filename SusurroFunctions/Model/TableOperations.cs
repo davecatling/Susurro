@@ -40,6 +40,16 @@ namespace SusurroFunctions.Model
             return true;
         }
 
+        internal static bool PutConId(string name, string conId)
+        {
+            var user = GetUser(name);
+            if (user == null) return false;
+            user.Add("ConnectionId", conId);
+            var tableClient = TableClient();
+            tableClient.UpsertEntity(user);
+            return true;
+        }
+
         internal async static Task<List<MessageDto>> PutMessagesAsync(List<MessageDto> messages)
         {
             var result = new List<MessageDto>();

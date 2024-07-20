@@ -25,9 +25,7 @@ namespace SusurroTestConsole
             builder.Configuration.AddJsonFile("appsettings.json", false);
 
             _http = new Http();
-            _signalR = new SignalR();
             builder.Configuration.GetSection("Http").Bind(_http);
-            builder.Configuration.GetSection("SignalR").Bind(_signalR);
 
             var command = string.Empty;
 
@@ -161,7 +159,8 @@ namespace SusurroTestConsole
                 Console.WriteLine($"User {name} logged in.");
                 _username = name;
                 _password = password;
-                _signalR!.ConnectAsync();
+                _signalR = new SignalR(name, password, _http);
+                _signalR.ConnectAsync();
             }
             else
             {
