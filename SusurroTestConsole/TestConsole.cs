@@ -132,10 +132,10 @@ namespace SusurroTestConsole
             var result = await _http!.SendMsgAsync(messages);
             if (result.IsSuccessStatusCode)
             {
-                Console.WriteLine("Message sent. Recipient message IDs:");
-                var sendResults = await result.Content.ReadFromJsonAsync<List<SendResult>>();
-                foreach (var item in sendResults!)
-                    Console.WriteLine($"{item.To}: {item.Id}");
+                Console.WriteLine("Message sent.");
+                //var sendResults = await result.Content.ReadFromJsonAsync<List<SendResult>>();
+                //foreach (var item in sendResults!)
+                //    Console.WriteLine($"{item.To}: {item.Id}");
             }
             else
             {

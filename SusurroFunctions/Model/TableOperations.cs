@@ -29,6 +29,13 @@ namespace SusurroFunctions.Model
             return user.GetString("PublicKey");
         }
 
+        internal static string GetConnectionId(string name)
+        {
+            var user = GetUser(name);
+            if (user == null) return null;
+            return user.GetString("ConnectionId");
+        }
+
         internal static bool PutPublicKey(string name, string publicKey)
         {
             var user = GetUser(name);

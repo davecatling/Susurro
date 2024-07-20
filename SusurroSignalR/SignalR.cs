@@ -31,7 +31,10 @@ namespace SusurroSignalR
             if (Connection.State == HubConnectionState.Connected)
             {
                 await _http.PutConIdAsync(_name, _password, Connection.ConnectionId!);
-                //Connection.On<string, string>("message", (user, message) =>
+                Connection.On<string>("newMessage", (message) =>
+                {
+                    Console.WriteLine(message);
+                });
             }
         }
     }

@@ -45,13 +45,18 @@ namespace SusurroFunctions
                         To = msg.To
                     });
                 }
-                await signalRMessages.AddAsync(
-                    new SignalRMessage
-                    {
-                        Target = "newMessage",
-                        Arguments = [.. sendMsgResults]
-                    });
-                return new OkObjectResult(sendMsgResults);
+                foreach (var msgResult in sendMsgResults)
+                {
+                    var recipientConId = TableOperations.GetConnectionId(msgResult.To);
+                    await signalRMessages.AddAsync(
+                        new SignalRMessage
+                        { 
+                            ConnectionId = recipientConId,
+                            Target = "newMessage",
+                            Arguments = [msgResult.Id]
+                        });
+                }
+                return new OkResult();
             }
             catch (Exception ex)
             {
