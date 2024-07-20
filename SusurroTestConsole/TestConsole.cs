@@ -161,12 +161,18 @@ namespace SusurroTestConsole
                 _password = password;
                 _signalR = new SignalR(name, password, _http);
                 _signalR.ConnectAsync();
+                _signalR.MsgIdReceived += SignalRmsgIdReceived;
             }
             else
             {
                 using var streamReader = new StreamReader(result.Content.ReadAsStream());
                 Console.WriteLine(streamReader.ReadToEnd());
             }
+        }
+
+        private void SignalRmsgIdReceived(object sender, MsgIdReceivedEventArgs e)
+        {
+            GetMsgAsync(["getmsg", e.Id]);
         }
 
         internal async void GetPublicKey(string[] elements)

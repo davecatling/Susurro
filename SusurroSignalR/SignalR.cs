@@ -13,6 +13,9 @@ namespace SusurroSignalR
         private string _name = name;
         private string _password = password;
 
+        public delegate void MsgIdReceivedEventHandler(object sender, MsgIdReceivedEventArgs e);
+        public event MsgIdReceivedEventHandler MsgIdReceived;        
+
         private HubConnection Connection
         {
             get
@@ -33,9 +36,14 @@ namespace SusurroSignalR
                 await _http.PutConIdAsync(_name, _password, Connection.ConnectionId!);
                 Connection.On<string>("newMessage", (message) =>
                 {
-                    Console.WriteLine(message);
+                    MsgIdReceived?.Invoke(this, new MsgIdReceivedEventArgs(message));
                 });
             }
         }
+    }
+
+    public class MsgIdReceivedEventArgs(string id) : EventArgs
+    {
+        public string Id { get; } = id;
     }
 }
