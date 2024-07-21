@@ -75,15 +75,14 @@ namespace SusurroTestConsole
                 return;
             }
             var msgDto = await _http!.GetMsgAsync(elements[1], _password);
-            var rsa = new Rsa(_http!);
-            var msgText = rsa.Decrypt(msgDto.Text, _username, _password);
-            var signatureOk = await rsa.SignatureOkAsync(msgDto.Signature, msgText, msgDto.From);
+            var msgText = Rsa.Decrypt(msgDto.Text, _username, _password);
+            var signatureOk = await new Rsa(_http!).SignatureOkAsync(msgDto.Signature, msgText, msgDto.From);
             if (!signatureOk)
             {
                 Console.WriteLine("Message signature check failed!");
                 return;
             }
-            Console.WriteLine(msgText);
+            Console.WriteLine($"----\nFrom: {msgDto.From}\nTo: {msgDto.AllTo}\n{msgText}\n----");
         }
 
         internal async void SendMsgAsync(string[] elements)
@@ -102,7 +101,6 @@ namespace SusurroTestConsole
             var plainText = Console.ReadLine();
             var messages = new List<MessageDto>();
             bool exceptionOccured = false;
-            var rsa = new Rsa(_http!);
             string allTo = string.Empty;
             for (var i = 1; i < elements.Length; i++)
             {
@@ -112,8 +110,8 @@ namespace SusurroTestConsole
                 byte[]? signature = null;
                 try
                 {
-                    cypherText = await rsa.EncryptAsync(plainText!, to);
-                    signature = rsa.Sign(plainText!, _username, _password);
+                    cypherText = await new Rsa(_http!).EncryptAsync(plainText!, to);
+                    signature = Rsa.Sign(plainText!, _username, _password);
                 }
                 catch (Exception ex)
                 {
@@ -186,19 +184,18 @@ namespace SusurroTestConsole
             }
             var username = elements[1];
             Console.WriteLine($"Getting public key for {username}...");
-            var rsa = new Rsa(_http!);
-            RSACryptoServiceProvider publicRsa;
+            RSACryptoServiceProvider cryptoServiceProvider;
             try
             {
-                publicRsa = await rsa.PublicRsaAsync(username);
+                cryptoServiceProvider = await new Rsa(_http!).PublicRsaAsync(username);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
                 return;
             }
-            if (publicRsa != null)
-                Console.WriteLine(publicRsa.ToXmlString(false));
+            if (cryptoServiceProvider != null)
+                Console.WriteLine(cryptoServiceProvider.ToXmlString(false));
         }
 
         internal async void CreateUser(string[] elements)
@@ -210,12 +207,11 @@ namespace SusurroTestConsole
             }
             var username = elements[1];
             var password = elements[2];
-            var rsa = new Rsa(_http!);
             var initialCallResult = await _http!.CreateUserAsync(username, password);
             if (initialCallResult.IsSuccessStatusCode)
             {
                 Console.WriteLine($"New user {username} created. Generating keys...");
-                var paths = rsa.CreateKeys(username, password);
+                var paths = Rsa.CreateKeys(username, password);
                 Console.WriteLine($"New keys created. Key paths:\n{paths[0]}\n{paths[1]}");
             }
             else
@@ -226,7 +222,7 @@ namespace SusurroTestConsole
                 return;
             }
             Console.WriteLine("Uploading public key...");
-            var publicRsa = await rsa.PublicRsaAsync(username);
+            var publicRsa = await new Rsa(_http!).PublicRsaAsync(username);
             var uploadResult = await _http.PutKeyAsync(username, password, publicRsa.ToXmlString(false));
             if (uploadResult.IsSuccessStatusCode)            
                 Console.WriteLine($"Public key uploaded.");
