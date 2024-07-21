@@ -34,6 +34,7 @@ namespace SusurroFunctions.Model
             if (!regex.IsMatch(password)) return false;
             regex = Numbers();
             if (!regex.IsMatch(password)) return false;
+            if (password.Contains(' ')) return false;
             return true;
         }
 

@@ -5,6 +5,7 @@ using SusurroRsa;
 using SusurroDtos;
 using SusurroSignalR;
 using System.Security.Cryptography;
+using System.Linq;
 using System.Net.Http.Json;
 
 namespace SusurroTestConsole
@@ -102,8 +103,10 @@ namespace SusurroTestConsole
             var messages = new List<MessageDto>();
             bool exceptionOccured = false;
             var rsa = new Rsa(_http!);
+            string allTo = string.Empty;
             for (var i = 1; i < elements.Length; i++)
             {
+                allTo += $"{elements[i]} ";
                 var to = elements[i];
                 byte[]? cypherText = null;
                 byte[]? signature = null;
@@ -129,13 +132,12 @@ namespace SusurroTestConsole
                     });
                 }
             }
+            allTo = allTo[..^1];
+            messages.ForEach(m => m.AllTo = allTo);
             var result = await _http!.SendMsgAsync(messages);
             if (result.IsSuccessStatusCode)
             {
                 Console.WriteLine("Message sent.");
-                //var sendResults = await result.Content.ReadFromJsonAsync<List<SendResult>>();
-                //foreach (var item in sendResults!)
-                //    Console.WriteLine($"{item.To}: {item.Id}");
             }
             else
             {

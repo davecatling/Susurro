@@ -30,13 +30,15 @@ namespace SusurroFunctions
                 if (userDto.Name?.Length == 0 || userDto.Password?.Length == 0)
                     // Reject if either username or password missing
                     return new BadRequestObjectResult("Username and password are required");
+                if (userDto.Name.Contains(' '))
+                    return new BadRequestObjectResult("Usernames cannot contain spaces");
                 // Return if user already exists
                 if (TableOperations.UserExists(userDto.Name))
                     return new BadRequestObjectResult($"Username {userDto.Name} is not available");
                 // Verify password for complexity and HIBP appearance
                 if (!PasswordChecker.Complexity(userDto.Password))
-                    errorMsg.AppendLine("Passwords must have at least eight characters, a mix of upper and "
-                        + "lowercase characters, special characters and numbers.");
+                    errorMsg.AppendLine("Passwords must have at least eight characters, no spaces, " +
+                        "a mix of upper and lowercase characters, special characters and numbers.");
                 var hibpCount = await PasswordChecker.HibpCount(userDto.Password);
                 if (hibpCount != 0)
                     errorMsg.AppendLine($"Your password appears {hibpCount} time{(hibpCount > 1 ? "s" : "")} " +

@@ -67,6 +67,7 @@ namespace SusurroFunctions.Model
                 var msgEntity = new TableEntity(partitionKey: "msgs", rowKey: id)
                 {
                     { "From", message.From },
+                    { "AllTo", message.AllTo },
                     { "To", message.To },
                     { "Text", message.Text },
                     { "Signature", message.Signature },

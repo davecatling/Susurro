@@ -37,6 +37,7 @@ namespace SusurroFunctions
             {
                 Id = msg.RowKey,
                 From = msg.GetString("From"),
+                AllTo = msg.GetString("AllTo"),
                 To = msg.GetString("To"),
                 Text = msg.GetBinary("Text"),
                 Signature = msg.GetBinary("Signature")
