@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using SusurroHttp;
-using System;
-using System.Net.Http;
-using System.Runtime.InteropServices;
 
 namespace SusurroSignalR
 {
@@ -10,11 +7,11 @@ namespace SusurroSignalR
     {
         private HubConnection? _connection;
         private readonly IComms _http = http;
-        private string _name = name;
-        private string _password = password;
+        private readonly string _name = name;
+        private readonly string _password = password;
 
         public delegate void MsgIdReceivedEventHandler(object sender, MsgIdReceivedEventArgs e);
-        public event MsgIdReceivedEventHandler MsgIdReceived;        
+        public event MsgIdReceivedEventHandler? MsgIdReceived;        
 
         private HubConnection Connection
         {

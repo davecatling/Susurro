@@ -24,18 +24,14 @@ namespace SusurroFunctions
             try
             {                
                 var errorMsg = new StringBuilder();
-                // JSON payload of user details expected
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 var userDto = JsonConvert.DeserializeObject<NewUserDto>(requestBody);
                 if (userDto.Name?.Length == 0 || userDto.Password?.Length == 0)
-                    // Reject if either username or password missing
                     return new BadRequestObjectResult("Username and password are required");
                 if (userDto.Name.Contains(' '))
                     return new BadRequestObjectResult("Usernames cannot contain spaces");
-                // Return if user already exists
                 if (TableOperations.UserExists(userDto.Name))
                     return new BadRequestObjectResult($"Username {userDto.Name} is not available");
-                // Verify password for complexity and HIBP appearance
                 if (!PasswordChecker.Complexity(userDto.Password))
                     errorMsg.AppendLine("Passwords must have at least eight characters, no spaces, " +
                         "a mix of upper and lowercase characters, special characters and numbers.");
@@ -43,13 +39,10 @@ namespace SusurroFunctions
                 if (hibpCount != 0)
                     errorMsg.AppendLine($"Your password appears {hibpCount} time{(hibpCount > 1 ? "s" : "")} " +
                         $"in the Have I Been Pwned database of known breaches.");
-                // Return error msg if password validation failed
                 if (errorMsg.ToString().Length > 0)
                     return new BadRequestObjectResult($"{errorMsg.ToString().Trim()}");
-                // Generate salt and hash password
                 var salt = HashAndSalt.GenerateSalt();
                 var passwordHash = HashAndSalt.GetHash(userDto.Password, salt);
-                // Create and store user details
                 var user = new UserDto()
                 {
                     Name = userDto.Name,
