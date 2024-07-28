@@ -82,7 +82,8 @@ namespace SusurroTestConsole
                 Console.WriteLine("Message signature check failed!");
                 return;
             }
-            Console.WriteLine($"----\nFrom: {msgDto.From}\nTo: {msgDto.AllTo}\n{msgText}\n----");
+            Console.WriteLine($"----\nFrom: {msgDto.From}\nTo: {msgDto.AllTo}" +
+                $"\nSent: {msgDto.CreateTime.ToLocalTime():dd-MM-yyyy HH:mm}\n{msgText}\n----");
         }
 
         internal async void SendMsgAsync(string[] elements)

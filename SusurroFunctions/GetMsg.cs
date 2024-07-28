@@ -37,6 +37,7 @@ namespace SusurroFunctions
             {
                 Id = msg.RowKey,
                 From = msg.GetString("From"),
+                CreateTime = (DateTime)msg.GetDateTime("Created"),
                 AllTo = msg.GetString("AllTo"),
                 To = msg.GetString("To"),
                 Text = msg.GetBinary("Text"),

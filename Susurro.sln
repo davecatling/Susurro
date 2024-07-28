@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SusurroDtos", "SusurroDtos\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SusurroRsa", "SusurroRsa\SusurroRsa.csproj", "{FEAB95CA-1F57-4350-809F-49457940E5F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SusurroSignalR", "SusurroSignalR\SusurroSignalR.csproj", "{8B34940C-C869-4D2A-991C-BDC653B1E771}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SusurroSignalR", "SusurroSignalR\SusurroSignalR.csproj", "{8B34940C-C869-4D2A-991C-BDC653B1E771}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Susurro", "Susurro\Susurro.csproj", "{90F93238-AD76-40D7-BA3D-75A16938C395}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{8B34940C-C869-4D2A-991C-BDC653B1E771}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B34940C-C869-4D2A-991C-BDC653B1E771}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B34940C-C869-4D2A-991C-BDC653B1E771}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90F93238-AD76-40D7-BA3D-75A16938C395}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90F93238-AD76-40D7-BA3D-75A16938C395}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90F93238-AD76-40D7-BA3D-75A16938C395}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90F93238-AD76-40D7-BA3D-75A16938C395}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

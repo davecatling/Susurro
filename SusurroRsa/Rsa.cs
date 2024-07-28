@@ -7,6 +7,7 @@ namespace SusurroRsa
     public class Rsa(IComms http)
     {
         private readonly IComms _http = http;
+        private const string KEYFOLDER = @"\Susurro\keys";
 
         private static RSACryptoServiceProvider NewServiceProvider()
         {
@@ -19,7 +20,7 @@ namespace SusurroRsa
 
         private static string PublicKeyPath(string username)
         {
-            var path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"\Susurro\keys");
+            var path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), KEYFOLDER);
             Directory.CreateDirectory(path);
             path = Path.Join(path, $"{username}-public.xml");
             return path;
@@ -30,6 +31,13 @@ namespace SusurroRsa
             var path = PublicKeyPath(username);
             path = string.Concat(path.AsSpan(0, path.Length - 10), "private.p8");
             return path;
+        }
+
+        public static List<string> PrivateKeyFiles()
+        {
+            var path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), KEYFOLDER);
+            var directory = Directory.CreateDirectory(path);
+            return directory.GetFiles("*.p8").Select(fi => fi.Name[..^3]).ToList();
         }
 
         public static string[] CreateKeys(string username, string password, bool overwrite = false)
