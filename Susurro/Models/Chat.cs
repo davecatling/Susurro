@@ -8,26 +8,30 @@ using System.Threading.Tasks;
 
 namespace Susurro.Models
 {
-    public class Chat (SusurroMain susurroMain) : INotifyPropertyChanged
+    public class Chat()
     {
-        private SusurroMain _susurroMain = susurroMain;
-        private string? _chatText;
-        private List<string> _participants = [];
+        private readonly List<string> _participants = [];
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public delegate void MessageReceivedEventHandler(object sender, MessageReceivedEventArgs e);
+        public delegate void ParticipantAddedEventHandler(object sender, ParticipantAddedEventArgs e);
+        public event MessageReceivedEventHandler? MessageReceived;
+        public event ParticipantAddedEventHandler? ParticipantAdded;
 
         public override string ToString()
         {
             return Participants;
         }
 
+        public List<Message>? Messages { get; private set; }
+
         public string Participants
         {
             get
             {
                 var result = string.Empty;
-                if (_participants.Any())
+                if (_participants.Count != 0)
                 {
+                    _participants.Sort();
                     foreach (var item in _participants)
                     {
                         result += $"{item} ";
@@ -39,31 +43,32 @@ namespace Susurro.Models
             }
         }
 
-        public bool AddParticipant(string participant)
+        public void AddMessage(Message message)
         {
-            if (_participants.Count >= 6)
-                return false;
-            _participants.Add(participant);
-            OnPropertyChanged(nameof(Participants));
-            return true;
+            Messages ??= [];
+            Messages.Add(message);
+            MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
         }
 
-        private void OnPropertyChanged(string? property)
+        public void AddParticipant(string participant)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-        }               
-
-        public string? ChatText
-        {
-            get
+            if (_participants.Count <= 6)
             {
-                return _chatText;
+                _participants.Add(participant);
+                ParticipantAdded?.Invoke(this, new ParticipantAddedEventArgs(participant));
             }
-            set
-            {
-                _chatText = value;
-                OnPropertyChanged(nameof(ChatText));
-            }
+            else
+                throw new InvalidOperationException("Maximum chat participants reached");
         }        
+    }
+
+    public class MessageReceivedEventArgs(Message message) : EventArgs
+    {
+        public Message Message { get; } = message;
+    }
+
+    public class ParticipantAddedEventArgs(string participant) : EventArgs
+    {
+        public string Participant { get; } = participant;
     }
 }

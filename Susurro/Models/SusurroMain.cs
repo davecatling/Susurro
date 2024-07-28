@@ -15,27 +15,18 @@ using System.Xml.Linq;
 
 namespace Susurro.Models
 {
-    public class SusurroMain : INotifyPropertyChanged
+    public class SusurroMain
     {
-        private readonly IComms _http;
+        private readonly Http _http;
         private readonly Rsa _rsa;
-        private SignalR _signalR;
-        private string _username;
-        private string _password;
+        private SignalR? _signalR;
+        private string? _username;
+        private string? _password;
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public string? Username { get { return _username; } }
 
-        public string Username
-        {
-            get { return _username; }
-            set
-            {
-                _username = value;
-                OnPropertyChanged(nameof(Username));
-            }
-        }
-
-        public ObservableCollection<Chat> Chats { get; }
+        public List<Chat> Chats { get; }
+        public event EventHandler? LoginSuccess;
 
         public SusurroMain()
         {
@@ -45,38 +36,34 @@ namespace Susurro.Models
             _http = new Http();
             builder.Configuration.GetSection("Http").Bind(_http);
             _rsa = new Rsa(_http);
-            Chats = [new Chat(this) { ChatText = "Chat 1"}, 
-                new Chat(this) { ChatText = "Chat 2"}];
-            LoginAsync("dave", "P@ssw0rd4D@ve");
+            Chats = [new Chat(), new Chat()];  
         }
 
-        public async void LoginAsync (string name, string password)
+        public async Task LoginAsync (string name, string password)
         {
             var result = await _http!.Login(name, password);
             if (result.IsSuccessStatusCode)
             {
-                Console.WriteLine($"User {name} logged in.");
-                Username = name;
+                _username = name;
                 _password = password;
                 _signalR = new SignalR(name, password, _http);
                 _signalR.ConnectAsync();
                 _signalR.MsgIdReceived += SignalRmsgIdReceived;
+                LoginSuccess?.Invoke(this, new EventArgs());
+                Chats[0].AddParticipant("tom");
+                Chats[0].AddParticipant("jerry");
+                Chats[0].AddMessage(new Message("tom", "Hi from Tom", DateTime.Now));
             }
             else
             {
                 using var streamReader = new StreamReader(result.Content.ReadAsStream());
-                Console.WriteLine(streamReader.ReadToEnd());
+                throw new Exception(streamReader.ReadToEnd());
             }
         }
 
         private void SignalRmsgIdReceived(object sender, MsgIdReceivedEventArgs e)
         {
             throw new NotImplementedException();
-        }
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }    
 }

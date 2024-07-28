@@ -7,36 +7,10 @@ using System.Threading.Tasks;
 
 namespace Susurro.Models
 {
-    public class Message : INotifyPropertyChanged
+    public class Message (string from, string text, DateTime createdTime)
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        private string? _from;
-        private string? _text;
-
-        public string? From
-        {
-            get { return _from; }
-            set
-            {
-                _from = value;
-                OnPropertyChanged(nameof(From));
-            }
-        }
-
-        public string? Text
-        {
-            get { return _text; }
-            set
-            {
-                _text = value;
-                OnPropertyChanged(nameof(Text));
-            }
-        }
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        public string From { get; } = from;
+        public string Text { get; } = text;
+        public DateTime CreatedTime { get; } = createdTime;
     }
 }
