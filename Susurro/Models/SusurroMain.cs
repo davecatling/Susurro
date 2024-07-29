@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Xml.Linq;
+using SusurroDtos;
 
 namespace Susurro.Models
 {
@@ -73,6 +74,34 @@ namespace Susurro.Models
                 using var streamReader = new StreamReader(result.Content.ReadAsStream());
                 throw new Exception(streamReader.ReadToEnd());
             }
+        }
+
+        public async Task SendMessageAsync(string participants, string plainText)
+        {
+            if (_username == null || _password == null)
+                throw new InvalidOperationException("Username or password not set");
+            var messages = new List<MessageDto>();
+            var participantsArr = participants.Split(' ');
+            for (var i = 0; i < participantsArr.Length; i++)
+            {
+                var to = participantsArr[i];
+                byte[]? cypherText = null;
+                byte[]? signature = null;
+                cypherText = await _rsa.EncryptAsync(plainText!, to);
+                signature = Rsa.Sign(plainText!, _username, _password);
+                messages.Add(new MessageDto()
+                {
+                    From = _username,
+                    Password = _password,
+                    To = to,
+                    Text = cypherText!,
+                    Signature = signature!
+                });
+            }
+            messages.ForEach(m => m.AllTo = participants);
+            var result = await _http!.SendMsgAsync(messages);
+            if (!result.IsSuccessStatusCode)
+                throw new Exception(await result.Content.ReadAsStringAsync());
         }
 
         private void SignalRmsgIdReceived(object sender, MsgIdReceivedEventArgs e)

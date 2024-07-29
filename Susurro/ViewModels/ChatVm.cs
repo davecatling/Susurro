@@ -18,7 +18,9 @@ namespace Susurro.ViewModels
         private readonly Chat _chat;
         private string? _participants;
         private string? _newParticipant;
+        private string? _plainText;
         private ICommand? _addParticipantCommand;
+        private ICommand? _sendMessageCommand;
 
         public ChatVm(Chat chat)
         {
@@ -29,9 +31,21 @@ namespace Susurro.ViewModels
 
         public string? NewParticipant
         {
-            get { return _newParticipant; }
-            set { _newParticipant = value;
+            get => _newParticipant;
+            set
+            {
+                _newParticipant = value;
                 OnPropertyChanged(nameof(NewParticipant));
+            }
+        }
+
+        public string? PlainText
+        {
+            get => _plainText;
+            set
+            {
+                _plainText = value;
+                OnPropertyChanged(nameof(PlainText));
             }
         }
 
@@ -41,6 +55,15 @@ namespace Susurro.ViewModels
             {
                 _addParticipantCommand ??= new RelayCommand((exec) => AddParticipant());
                 return _addParticipantCommand;
+            }
+        }
+
+        public ICommand SendMessageCommand
+        {
+            get
+            {
+                _sendMessageCommand ??= new RelayCommand((exec) => SendMessageAsync());
+                return _sendMessageCommand;
             }
         }
 
@@ -78,5 +101,13 @@ namespace Susurro.ViewModels
             }
         }
 
+        private async void SendMessageAsync()
+        {
+            if (PlainText != null)
+            {
+                await _chat.SendMessageAsync(PlainText);
+                PlainText = null;
+            }
+        }
     }
 }

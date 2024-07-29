@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SusurroDtos;
+using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,7 +19,7 @@ namespace Susurro.Models
         public event MessageReceivedEventHandler? MessageReceived;
         public event ParticipantAddedEventHandler? ParticipantAdded;
 
-        public List<Message>? Messages { get; private set; }
+        public List<Message> Messages { get; private set; } = [];
 
         public string? Participants
         {
@@ -29,9 +30,7 @@ namespace Susurro.Models
                 {
                     _participants.Sort();
                     foreach (var item in _participants)
-                    {
-                        result += $"{item}/";
-                    }
+                        result += $"{item} ";
                     return result[..^1];
                 }
                 else
@@ -41,7 +40,6 @@ namespace Susurro.Models
 
         public void AddMessage(Message message)
         {
-            Messages ??= [];
             Messages.Add(message);
             MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
         }
@@ -55,7 +53,15 @@ namespace Susurro.Models
             }
             else
                 throw new InvalidOperationException("Maximum chat participants reached");
-        }        
+        }
+        
+        public async Task SendMessageAsync(string plainText)
+        {
+            if (Participants == null)
+                throw new InvalidOperationException("No chat participants");
+            await _susurroMain.SendMessageAsync(Participants, plainText);
+            AddMessage(new Message(_susurroMain.Username!, plainText, DateTime.Now));
+        }
     }
 
     public class MessageReceivedEventArgs(Message message) : EventArgs
