@@ -26,6 +26,8 @@ namespace Susurro.Models
         public string? Username { get { return _username; } }
 
         public List<Chat> Chats { get; }
+        public delegate void ChatAddedEventHandler(object sender, ChatAddedEventArgs e);
+        public event ChatAddedEventHandler? ChatAdded;
         public event EventHandler? LoginSuccess;
 
         public SusurroMain()
@@ -36,7 +38,22 @@ namespace Susurro.Models
             _http = new Http();
             builder.Configuration.GetSection("Http").Bind(_http);
             _rsa = new Rsa(_http);
-            Chats = [new Chat(), new Chat()];  
+            Chats = [];
+            AddNewChat();
+        }
+
+        private void AddNewChat()
+        {
+            var newChat = new Chat(this);
+            newChat.ParticipantAdded += ChatParticipantAdded;
+            Chats.Add(newChat);
+            ChatAdded?.Invoke(this, new ChatAddedEventArgs(newChat));
+        }
+
+        private void ChatParticipantAdded(object sender, ParticipantAddedEventArgs e)
+        {
+            if (!Chats.Any(c => c.Participants == null))
+                AddNewChat();
         }
 
         public async Task LoginAsync (string name, string password)
@@ -50,9 +67,6 @@ namespace Susurro.Models
                 _signalR.ConnectAsync();
                 _signalR.MsgIdReceived += SignalRmsgIdReceived;
                 LoginSuccess?.Invoke(this, new EventArgs());
-                Chats[0].AddParticipant("tom");
-                Chats[0].AddParticipant("jerry");
-                Chats[0].AddMessage(new Message("tom", "Hi from Tom", DateTime.Now));
             }
             else
             {
@@ -65,5 +79,10 @@ namespace Susurro.Models
         {
             throw new NotImplementedException();
         }
-    }    
+    }
+
+    public class ChatAddedEventArgs(Chat chat) : EventArgs
+    {
+        public Chat Chat { get; } = chat;
+    }
 }

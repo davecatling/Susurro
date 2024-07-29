@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace Susurro.Models
 {
-    public class Chat()
+    public class Chat(SusurroMain susurroMain)
     {
+        private readonly SusurroMain _susurroMain = susurroMain;
         private readonly List<string> _participants = [];
 
         public delegate void MessageReceivedEventHandler(object sender, MessageReceivedEventArgs e);
@@ -17,14 +18,9 @@ namespace Susurro.Models
         public event MessageReceivedEventHandler? MessageReceived;
         public event ParticipantAddedEventHandler? ParticipantAdded;
 
-        public override string ToString()
-        {
-            return Participants;
-        }
-
         public List<Message>? Messages { get; private set; }
 
-        public string Participants
+        public string? Participants
         {
             get
             {
@@ -34,12 +30,12 @@ namespace Susurro.Models
                     _participants.Sort();
                     foreach (var item in _participants)
                     {
-                        result += $"{item} ";
+                        result += $"{item}/";
                     }
-                    return result.Trim();
+                    return result[..^1];
                 }
                 else
-                    return "New chat";
+                    return null;
             }
         }
 
@@ -52,7 +48,7 @@ namespace Susurro.Models
 
         public void AddParticipant(string participant)
         {
-            if (_participants.Count <= 6)
+            if (_participants.Count < 6)
             {
                 _participants.Add(participant);
                 ParticipantAdded?.Invoke(this, new ParticipantAddedEventArgs(participant));
