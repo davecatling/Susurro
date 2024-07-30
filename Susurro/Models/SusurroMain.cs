@@ -104,9 +104,34 @@ namespace Susurro.Models
                 throw new Exception(await result.Content.ReadAsStringAsync());
         }
 
-        private void SignalRmsgIdReceived(object sender, MsgIdReceivedEventArgs e)
+        private async void SignalRmsgIdReceived(object sender, MsgIdReceivedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (_username == null || _password == null) return;
+            var message = await GetMessageAsync(e.Id);
+            AddMessageToChat(message);
+        }
+
+        private async Task<Message> GetMessageAsync(string id)
+        {
+            var messageDto = await _http.GetMsgAsync(id, _password!);
+            var plainText = Rsa.Decrypt(messageDto.Text, _username!, _password!);
+            return new Message(messageDto, plainText);
+        }
+
+        private void AddMessageToChat(Message message)
+        {
+            var requiredParticipants = new List<string>(message.AllTo!);
+            requiredParticipants.Remove(_username!);
+            requiredParticipants.Add(message.From);
+            foreach (var chat in Chats.Where(c => c.Participants != null))
+            {
+                var participants = chat.Participants!.Split(' ').ToList();
+                if (participants.Count == requiredParticipants.Count)
+                {
+                    if (participants.All(p => requiredParticipants.Contains(p)))
+                        chat.AddMessage(message);
+                }
+            }
         }
     }
 

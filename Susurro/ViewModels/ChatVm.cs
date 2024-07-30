@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Susurro.Models;
 
 namespace Susurro.ViewModels
@@ -84,7 +85,10 @@ namespace Susurro.ViewModels
 
         private void MessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            Messages.Add(e.Message);
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                Messages.Add(e.Message);
+            }));
         }
 
         private void OnPropertyChanged(string propertyName)
