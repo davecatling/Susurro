@@ -123,13 +123,28 @@ namespace Susurro.Models
             var requiredParticipants = new List<string>(message.AllTo!);
             requiredParticipants.Remove(_username!);
             requiredParticipants.Add(message.From);
+            var chatFound = false;
             foreach (var chat in Chats.Where(c => c.Participants != null))
-            {
+            {                
                 var participants = chat.Participants!.Split(' ').ToList();
                 if (participants.Count == requiredParticipants.Count)
                 {
                     if (participants.All(p => requiredParticipants.Contains(p)))
+                    {
                         chat.AddMessage(message);
+                        chatFound = true;
+                    }
+                }
+            }
+            if (!chatFound)
+            {
+                if (!Chats.Any(c => c.Participants == null))
+                    AddNewChat();
+                var chat = Chats.FirstOrDefault(c => c.Participants == null);
+                if (chat != null)
+                {
+                    requiredParticipants.ForEach(p => chat.AddParticipant(p));
+                    chat.AddMessage(message);
                 }
             }
         }

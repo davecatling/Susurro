@@ -7,7 +7,7 @@ namespace Susurro.Models
         public List<string>? AllTo { get; }
         public string From { get; } = from;
         public string Text { get; } = text;
-        public DateTime CreatedTime { get; } = createdTime;
+        public DateTime CreatedTime { get; } = createdTime.ToLocalTime();
 
         public Message(MessageDto messageDto, string plainText) : 
             this(messageDto.From, plainText, messageDto.CreateTime)

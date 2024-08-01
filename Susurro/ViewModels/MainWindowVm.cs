@@ -52,7 +52,10 @@ namespace Susurro.ViewModels
 
         private void ChatAdded(object sender, ChatAddedEventArgs e)
         {
-            ChatVms.Add(new ChatVm(e.Chat));
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                ChatVms.Add(new ChatVm(e.Chat));
+            }));
         }
 
         private async void LoginAsync(string username, string password)
