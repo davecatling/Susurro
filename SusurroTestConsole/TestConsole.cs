@@ -14,8 +14,8 @@ namespace SusurroTestConsole
     {
         private Http? _http;
         private SignalR? _signalR;
-        private string _username;
-        private string _password;
+        private string? _username;
+        private string? _password;
 
         internal void Startup()
         {
@@ -75,7 +75,7 @@ namespace SusurroTestConsole
                 return;
             }
             var msgDto = await _http!.GetMsgAsync(elements[1]);
-            var msgText = Rsa.Decrypt(msgDto.Text, _username, _password);
+            var msgText = Rsa.Decrypt(msgDto.Text, _username!, _password!);
             var signatureOk = await new Rsa(_http!).SignatureOkAsync(msgDto.Signature, msgText, msgDto.From);
             if (!signatureOk)
             {
@@ -93,7 +93,7 @@ namespace SusurroTestConsole
                 Console.WriteLine("Expected: sendmsg <recipient1name> <recipient2name>...");
                 return;
             }
-            if (_username == null)
+            if (_username == null || _password == null)
             {
                 Console.WriteLine("No logged in user. Please log in and try again.");
                 return;
@@ -159,7 +159,7 @@ namespace SusurroTestConsole
                 Console.WriteLine($"User {name} logged in.");
                 _username = name;
                 _password = password;
-                _signalR = new SignalR(name, password, _http);
+                _signalR = new SignalR(_http);
                 _signalR.ConnectAsync();
                 _signalR.MsgIdReceived += SignalRmsgIdReceived;
             }

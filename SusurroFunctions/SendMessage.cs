@@ -25,14 +25,12 @@ namespace SusurroFunctions
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             try
-            {                
+            {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 var msgDtos = JsonConvert.DeserializeObject<List<MessageDto>>(requestBody);
-                if (!msgDtos.All(dto => dto.From == msgDtos[0].From))
-                    throw new Exception("Inconsistant FROM values.");
                 var userDetails = UserDetailFactory.GetUserDetails(req.Headers.Authorization);
-                if (userDetails == null || msgDtos[0].From != userDetails.Name)
-                    throw new Exception("Invalid authorization header.");
+                if (userDetails == null || msgDtos.Any(m => m.From != userDetails.Name))
+                    throw new Exception("Invalid authorization header or FROM values");
                 if (!TableOperations.PasswordOk(msgDtos[0].From, userDetails.Password))
                     throw new Exception("Bad username or password");
                 var storedMsgDtos = await TableOperations.PutMessagesAsync(msgDtos);
@@ -50,7 +48,7 @@ namespace SusurroFunctions
                     var recipientConId = TableOperations.GetConnectionId(msgResult.To);
                     await signalRMessages.AddAsync(
                         new SignalRMessage
-                        { 
+                        {
                             ConnectionId = recipientConId,
                             Target = "newMessage",
                             Arguments = [msgResult.Id]

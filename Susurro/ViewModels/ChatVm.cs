@@ -20,6 +20,8 @@ namespace Susurro.ViewModels
         private string? _participants;
         private string? _newParticipant;
         private string? _plainText;
+        private int _unreadCount;
+        private bool _selected;
         private ICommand? _addParticipantCommand;
         private ICommand? _sendMessageCommand;
 
@@ -80,6 +82,32 @@ namespace Susurro.ViewModels
             {
                 _participants = value;
                 OnPropertyChanged(nameof(Participants));
+                OnPropertyChanged(nameof(Header));
+            }
+        }
+
+        public string Header
+        {
+            get 
+            { 
+                var result = $"{Participants}{(_unreadCount > 0 ? $" ({_unreadCount})"
+                    : "")}";
+                return result;
+            }
+        }
+
+        public bool Selected
+        {
+            get { return _selected; }
+            set
+            {
+                _selected = value;
+                if (_selected)
+                {
+                    _unreadCount = 0;
+                    OnPropertyChanged(nameof(Header));
+                }
+                OnPropertyChanged(nameof(Selected));
             }
         }
 
@@ -88,6 +116,11 @@ namespace Susurro.ViewModels
             System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 Messages.Add(e.Message);
+                if (!Selected)
+                {
+                    _unreadCount++;
+                    OnPropertyChanged(nameof(Header));
+                }                
             }));
         }
 

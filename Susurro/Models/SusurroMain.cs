@@ -64,7 +64,7 @@ namespace Susurro.Models
             {
                 _username = name;
                 _password = password;
-                _signalR = new SignalR(name, password, _http);
+                _signalR = new SignalR(_http);
                 _signalR.ConnectAsync();
                 _signalR.MsgIdReceived += SignalRmsgIdReceived;
                 LoginSuccess?.Invoke(this, new EventArgs());
@@ -121,7 +121,8 @@ namespace Susurro.Models
         {
             var requiredParticipants = new List<string>(message.AllTo!);
             requiredParticipants.Remove(_username!);
-            requiredParticipants.Add(message.From);
+            if (!requiredParticipants.Contains(message.From))
+                requiredParticipants.Add(message.From);
             var chatFound = false;
             foreach (var chat in Chats.Where(c => c.Participants != null))
             {                

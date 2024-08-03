@@ -21,6 +21,18 @@ namespace Susurro.ViewModels
             }
         }
 
+        public int SelectedChatIndex
+        {
+            get { return _selectedChatIndex; }
+            set 
+            { 
+                _selectedChatIndex = value;
+                for (int i = 0; i < ChatVms.Count; i++)
+                    ChatVms[i].Selected = (_selectedChatIndex == i);
+                OnPropertyChanged(nameof(SelectedChatIndex));
+            }
+        }
+
         public ObservableCollection<ChatVm> ChatVms
         {
             get { return _chatVms; }
@@ -28,6 +40,7 @@ namespace Susurro.ViewModels
 
         private readonly ObservableCollection<ChatVm> _chatVms;
         private string? _userName;
+        private int _selectedChatIndex;
 
         private void OnPropertyChanged(string propertyName)
         {
@@ -44,6 +57,7 @@ namespace Susurro.ViewModels
             {                
                 ChatVms.Add(new ChatVm(chat));
             }
+            SelectedChatIndex = 0;
             OnPropertyChanged(nameof(ChatVms));
             _susurroMain.LoginSuccess += LoginSuccess;
             _susurroMain.ChatAdded += ChatAdded;

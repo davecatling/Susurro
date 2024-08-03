@@ -3,12 +3,10 @@ using SusurroHttp;
 
 namespace SusurroSignalR
 {
-    public class SignalR(string name, string password, IComms http)
+    public class SignalR(IComms http)
     {
         private HubConnection? _connection;
         private readonly IComms _http = http;
-        private readonly string _name = name;
-        private readonly string _password = password;
 
         public delegate void MsgIdReceivedEventHandler(object sender, MsgIdReceivedEventArgs e);
         public event MsgIdReceivedEventHandler? MsgIdReceived;        

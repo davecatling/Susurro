@@ -61,10 +61,11 @@
             <TextBlock Text="{Binding Path=Username}"/>            
         </DockPanel>
         <TabControl Grid.Row="1" ItemsSource="{Binding Path=ChatVms}" 
+                    SelectedIndex="{Binding Path=SelectedChatIndex}" 
                     ContentTemplate="{StaticResource tabTemplate}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="TabItem">
-                    <Setter Property="Header" Value="{Binding Path=Participants}"/>
+                    <Setter Property="Header" Value="{Binding Path=Header}"/>
                 </Style>
             </TabControl.ItemContainerStyle>
         </TabControl>    
