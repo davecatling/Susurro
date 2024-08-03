@@ -1,7 +1,9 @@
 ﻿namespace SusurroHttp
 {
     using SusurroDtos;
+    using System.Net.Http.Headers;
     using System.Net.Http.Json;
+    using System.Text;
     using System.Xml.Linq;
 
     public class Http : IComms
@@ -62,9 +64,21 @@
         public async Task<HttpResponseMessage> Login(string name, string password)
         {
             HttpResponseMessage result;
-            result = await HttpClient.GetAsync(
-                    $"{HttpClient.BaseAddress}Login?name={name}&password={password}");            
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{HttpClient.BaseAddress}Login")
+            };
+            requestMessage.Headers.Authorization = AuthHeader(name, password);
+            result = await HttpClient.SendAsync(requestMessage);            
             return result;       
+        }
+
+        private static AuthenticationHeaderValue AuthHeader(string name, string password)
+        {
+            var base64HeaderValue = Convert.ToBase64String(Encoding.ASCII.GetBytes(
+                $"{name}:{password}"));
+            return new AuthenticationHeaderValue("Basic", base64HeaderValue);
         }
 
         public async Task<HttpResponseMessage> SendMsgAsync(List<MessageDto> messages)
