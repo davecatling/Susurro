@@ -10,6 +10,7 @@ using SusurroFunctions.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SusurroFunctions
@@ -24,13 +25,16 @@ namespace SusurroFunctions
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             try
-            {
+            {                
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 var msgDtos = JsonConvert.DeserializeObject<List<MessageDto>>(requestBody);
-                if (!TableOperations.PasswordOk(msgDtos[0].From, msgDtos[0].Password))
-                {
+                if (!msgDtos.All(dto => dto.From == msgDtos[0].From))
+                    throw new Exception("Inconsistant FROM values.");
+                var userDetails = UserDetailFactory.GetUserDetails(req.Headers.Authorization);
+                if (userDetails == null || msgDtos[0].From != userDetails.Name)
+                    throw new Exception("Invalid authorization header.");
+                if (!TableOperations.PasswordOk(msgDtos[0].From, userDetails.Password))
                     throw new Exception("Bad username or password");
-                }
                 var storedMsgDtos = await TableOperations.PutMessagesAsync(msgDtos);
                 var sendMsgResults = new List<SendResult>();
                 foreach (var msg in storedMsgDtos)

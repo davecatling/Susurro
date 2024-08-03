@@ -92,7 +92,6 @@ namespace Susurro.Models
                 messages.Add(new MessageDto()
                 {
                     From = _username,
-                    Password = _password,
                     To = to,
                     Text = cypherText!,
                     Signature = signature!
@@ -113,7 +112,7 @@ namespace Susurro.Models
 
         private async Task<Message> GetMessageAsync(string id)
         {
-            var messageDto = await _http.GetMsgAsync(id, _password!);
+            var messageDto = await _http.GetMsgAsync(id);
             var plainText = Rsa.Decrypt(messageDto.Text, _username!, _password!);
             return new Message(messageDto, plainText);
         }

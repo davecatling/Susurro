@@ -22,7 +22,9 @@ namespace SusurroFunctions
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             string id = req.Query["id"];
-            string password = req.Query["password"];
+            var userDetails = UserDetailFactory.GetUserDetails(req.Headers.Authorization);
+            if (userDetails == null)
+                return new BadRequestObjectResult("Invalid authorization header.");
             TableEntity msg = null;
             await Task.Run(() =>
             {
@@ -31,7 +33,7 @@ namespace SusurroFunctions
             if (msg == null)
                 return new NotFoundObjectResult($"Message {id} not found.");
             var to = msg.GetString("To");
-            if (!TableOperations.PasswordOk(to, password))
+            if (!TableOperations.PasswordOk(to, userDetails.Password))
                 return new BadRequestObjectResult($"Message retrieval failed.");
             var msgDto = new MessageDto()
             {

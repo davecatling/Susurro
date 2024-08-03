@@ -74,7 +74,7 @@ namespace SusurroTestConsole
                 Console.WriteLine("Expected: getmsg <msgId>");
                 return;
             }
-            var msgDto = await _http!.GetMsgAsync(elements[1], _password);
+            var msgDto = await _http!.GetMsgAsync(elements[1]);
             var msgText = Rsa.Decrypt(msgDto.Text, _username, _password);
             var signatureOk = await new Rsa(_http!).SignatureOkAsync(msgDto.Signature, msgText, msgDto.From);
             if (!signatureOk)
@@ -124,7 +124,6 @@ namespace SusurroTestConsole
                     messages.Add(new MessageDto()
                     {
                         From = _username,
-                        Password = _password,
                         To = to,
                         Text = cypherText!,
                         Signature = signature!
@@ -222,9 +221,11 @@ namespace SusurroTestConsole
                 Console.WriteLine(streamReader.ReadToEnd());
                 return;
             }
+            Console.WriteLine("Logging in as new user..");
+            Login(["",username, password]);
             Console.WriteLine("Uploading public key...");
             var publicRsa = await new Rsa(_http!).PublicRsaAsync(username);
-            var uploadResult = await _http.PutKeyAsync(username, password, publicRsa.ToXmlString(false));
+            var uploadResult = await _http.PutKeyAsync(publicRsa.ToXmlString(false));
             if (uploadResult.IsSuccessStatusCode)            
                 Console.WriteLine($"Public key uploaded.");
             else

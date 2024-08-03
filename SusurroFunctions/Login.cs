@@ -18,8 +18,7 @@ namespace SusurroFunctions
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
-            var authHeader = req.Headers.Authorization;
-            var userDetails = UserDetailFactory.GetUserDetails(authHeader);
+            var userDetails = UserDetailFactory.GetUserDetails(req.Headers.Authorization);
             if (userDetails == null)
                 return new BadRequestObjectResult("Invalid authorization header.");
             bool result = false;

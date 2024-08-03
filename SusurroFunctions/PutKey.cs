@@ -19,11 +19,13 @@ namespace SusurroFunctions
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var putKeyDto = JsonConvert.DeserializeObject<PutStringDto>(requestBody);
-            if (!TableOperations.PasswordOk(putKeyDto.Name, putKeyDto.Password))
+            var key = await new StreamReader(req.Body).ReadToEndAsync();
+            var userDetails = UserDetailFactory.GetUserDetails(req.Headers.Authorization);
+            if (userDetails == null)
+                return new BadRequestObjectResult("Invalid authorization header.");
+            if (!TableOperations.PasswordOk(userDetails.Name, userDetails.Password))
                 return new BadRequestObjectResult($"Put key failure.");
-            var result = TableOperations.PutPublicKey(putKeyDto.Name, putKeyDto.Value);
+            var result = TableOperations.PutPublicKey(userDetails.Name, key);
             if (!result)
                 return new BadRequestObjectResult($"Put key failure.");
             return new OkObjectResult("Put key success.");

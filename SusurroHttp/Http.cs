@@ -4,7 +4,6 @@
     using System.Net.Http.Headers;
     using System.Net.Http.Json;
     using System.Text;
-    using System.Xml.Linq;
 
     public class Http : IComms
     {
@@ -46,11 +45,15 @@
             return result;
         }
 
-        public async Task<MessageDto> GetMsgAsync(string id, string password)
+        public async Task<MessageDto> GetMsgAsync(string id)
         {
             HttpResponseMessage result;
-            result = await HttpClient.GetAsync(
-                $"{HttpClient.BaseAddress}GetMsg?id={id}&password={password}");
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{HttpClient.BaseAddress}GetMsg?id={id}")
+            };
+            result = await HttpClient.SendAsync(requestMessage);
             if (!result.IsSuccessStatusCode)
             {
                 var response = await result.Content.ReadAsStringAsync();
@@ -69,16 +72,11 @@
                 Method = HttpMethod.Get,
                 RequestUri = new Uri($"{HttpClient.BaseAddress}Login")
             };
-            requestMessage.Headers.Authorization = AuthHeader(name, password);
-            result = await HttpClient.SendAsync(requestMessage);            
-            return result;       
-        }
-
-        private static AuthenticationHeaderValue AuthHeader(string name, string password)
-        {
             var base64HeaderValue = Convert.ToBase64String(Encoding.ASCII.GetBytes(
                 $"{name}:{password}"));
-            return new AuthenticationHeaderValue("Basic", base64HeaderValue);
+            HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64HeaderValue);
+            result = await HttpClient.SendAsync(requestMessage);            
+            return result;       
         }
 
         public async Task<HttpResponseMessage> SendMsgAsync(List<MessageDto> messages)
@@ -89,19 +87,17 @@
             return result;
         }
 
-        public async Task<HttpResponseMessage> PutKeyAsync(string name, string password, string key)
+        public async Task<HttpResponseMessage> PutKeyAsync(string key)
         {
-            var putValueDto = new PutStringDto() { Name = name, Password = password, Value = key };
-            var result = await HttpClient.PostAsJsonAsync<PutStringDto>($"{HttpClient.BaseAddress}PutKey",
-                putValueDto);
+            var result = await HttpClient.PostAsync($"{HttpClient.BaseAddress}PutKey",
+                new StringContent(key));
             return result;
         }
 
-        public async Task<HttpResponseMessage> PutConIdAsync(string name, string password, string conId)
+        public async Task<HttpResponseMessage> PutConIdAsync(string conId)
         {
-            var putValueDto = new PutStringDto() { Name = name, Password = password, Value = conId };
-            var result = await HttpClient.PostAsJsonAsync<PutStringDto>($"{HttpClient.BaseAddress}PutConId",
-                putValueDto);
+            var result = await HttpClient.PostAsync($"{HttpClient.BaseAddress}PutConId",
+                new StringContent(conId));
             return result;
         }
 

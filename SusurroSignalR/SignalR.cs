@@ -30,7 +30,7 @@ namespace SusurroSignalR
             await Connection.StartAsync();
             if (Connection.State == HubConnectionState.Connected)
             {
-                await _http.PutConIdAsync(_name, _password, Connection.ConnectionId!);
+                await _http.PutConIdAsync(Connection.ConnectionId!);
                 Connection.On<string>("newMessage", (message) =>
                 {
                     MsgIdReceived?.Invoke(this, new MsgIdReceivedEventArgs(message));
