@@ -61,7 +61,7 @@ namespace Susurro.ViewModels
             OnPropertyChanged(nameof(ChatVms));
             _susurroMain.LoginSuccess += LoginSuccess;
             _susurroMain.ChatAdded += ChatAdded;
-            LoginAsync("dave", "P@ssw0rd4D@ve");
+            //LoginAsync("dave", "P@ssw0rd4D@ve");
         }
 
         private void ChatAdded(object sender, ChatAddedEventArgs e)
