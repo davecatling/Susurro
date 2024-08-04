@@ -163,10 +163,11 @@ namespace Susurro.ViewModels
         {
             Username = _susurroMain!.Username;
             ClearLoginValues();
-            //foreach (var chat in _susurroMain!.Chats)
-            //{
-            //    ChatVms.Add(new ChatVm(chat));
-            //}
+            _chatVms.Clear();
+            foreach (var chat in _susurroMain!.Chats)
+            {
+                ChatVms.Add(new ChatVm(chat));
+            }
             SelectedChatIndex = 0;
         }
 

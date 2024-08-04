@@ -82,11 +82,8 @@ namespace Susurro.Models
             var result = await _http!.LogoutAsync();
             if (result.IsSuccessStatusCode && _signalR != null)
             {
-                while (Chats?.Count > 1)
-                {
-                    if (Chats.First().Participants != null)
-                        Chats.Remove(Chats.First());
-                }
+                while (Chats?.Count > 0)
+                    Chats.Remove(Chats.First());
                 _signalR.DisconnectAsync();
                 _signalR.MsgIdReceived -= SignalRmsgIdReceived;
                 LogoutSuccess?.Invoke(this, new EventArgs());
