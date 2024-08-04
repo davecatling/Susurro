@@ -46,13 +46,16 @@ namespace SusurroFunctions
                 foreach (var msgResult in sendMsgResults)
                 {
                     var recipientConId = TableOperations.GetConnectionId(msgResult.To);
-                    await signalRMessages.AddAsync(
-                        new SignalRMessage
-                        {
-                            ConnectionId = recipientConId,
-                            Target = "newMessage",
-                            Arguments = [msgResult.Id]
-                        });
+                    if (recipientConId != null)
+                    {
+                        await signalRMessages.AddAsync(
+                            new SignalRMessage
+                            {
+                                ConnectionId = recipientConId,
+                                Target = "newMessage",
+                                Arguments = [msgResult.Id]
+                            });
+                    }
                 }
                 return new OkResult();
             }
