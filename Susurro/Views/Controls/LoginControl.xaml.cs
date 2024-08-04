@@ -27,11 +27,20 @@ namespace Susurro.Views.Controls
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            ClearPasswords();
+        }
+
+        private void ClearPasswords()
+        {
             ((dynamic)this.DataContext).PasswordsLocked = true;
             LoginPwdBox.Password = null;
             CreatePwdBox1.Password = null;
             CreatePwdBox2.Password = null;
             ((dynamic)this.DataContext).PasswordsLocked = false;
+        }
+        private void CreateUserButton_Click(object sender, RoutedEventArgs e)
+        {
+            ClearPasswords();
         }
     }
 }

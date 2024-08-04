@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Susurro.Models;
 
@@ -99,13 +100,14 @@ namespace Susurro.ViewModels
             }
         }
 
-        private ObservableCollection<ChatVm> _chatVms;
+        private ObservableCollection<ChatVm>? _chatVms;
         private ICommand? _loginCommand;
         private ICommand? _logoutCommand;
+        private ICommand? _createUserCommand;
         private string? _userName;
         private int _selectedChatIndex;
 
-        public ObservableCollection<ChatVm> ChatVms
+        public ObservableCollection<ChatVm>? ChatVms
         {
             get { return _chatVms; }
             set { _chatVms = value; }
@@ -124,8 +126,17 @@ namespace Susurro.ViewModels
         {
             get
             {
-                _logoutCommand ??= new RelayCommand(async (exec0) => await LogoutAsync());
+                _logoutCommand ??= new RelayCommand(async (exec) => await LogoutAsync());
                 return _logoutCommand;
+            }
+        }
+
+        public ICommand CreateUserCommand
+        {
+            get
+            {
+                _createUserCommand ??= new RelayCommand(async (exec) => await CreateUserAsync());
+                return _createUserCommand;
             }
         }
 
@@ -140,11 +151,6 @@ namespace Susurro.ViewModels
         {
             _susurroMain = new SusurroMain();
             ChatVms = [];
-            //foreach (var chat in _susurroMain.Chats)
-            //{                
-            //    ChatVms.Add(new ChatVm(chat));
-            //}
-            //SelectedChatIndex = 0;
             OnPropertyChanged(nameof(ChatVms));
             _susurroMain.LoginSuccess += LoginSuccess;
             _susurroMain.LogoutSuccess += LogoutSuccess;
@@ -192,6 +198,17 @@ namespace Susurro.ViewModels
         {
             if (LoginName == null || LoginPassword == null) return;
             await _susurroMain.LoginAsync(LoginName, LoginPassword);
+        }
+
+        private async Task CreateUserAsync()
+        {
+            if (CreateName == null || CreatePassword1 == null) return;
+            if (CreatePassword1 != CreatePassword2)
+            {
+                MessageBox.Show("The provided passwords do not match.");
+                return;
+            }
+            await _susurroMain.CreateUserAsync(CreateName, CreatePassword1);
         }
 
         private async Task LogoutAsync()

@@ -77,6 +77,25 @@ namespace Susurro.Models
             }
         }
 
+        public async Task CreateUserAsync(string name, string password)
+        {
+            var initialCallResult = await _http!.CreateUserAsync(name, password);
+            if (!initialCallResult.IsSuccessStatusCode)
+            {
+                using var streamReader = new StreamReader(initialCallResult.Content.ReadAsStream());
+                throw new Exception(streamReader.ReadToEnd());
+            }
+            _ = Rsa.CreateKeys(name, password);
+            await LoginAsync(name, password);
+            var publicRsa = await new Rsa(_http!).PublicRsaAsync(name);
+            var uploadResult = await _http.PutKeyAsync(publicRsa.ToXmlString(false));
+            if (!uploadResult.IsSuccessStatusCode)
+            {
+                using var streamReader = new StreamReader(uploadResult.Content.ReadAsStream());
+                throw new Exception(streamReader.ReadToEnd());
+            }
+        }
+
         public async Task LogoutAsync ()
         {
             var result = await _http!.LogoutAsync();
