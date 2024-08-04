@@ -153,7 +153,7 @@ namespace SusurroTestConsole
             }
             var name = elements[1];
             var password = elements[2];
-            var result = await _http!.Login(name, password);
+            var result = await _http!.LoginAsync(name, password);
             if (result.IsSuccessStatusCode)
             {
                 Console.WriteLine($"User {name} logged in.");

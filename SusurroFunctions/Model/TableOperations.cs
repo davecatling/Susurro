@@ -149,6 +149,20 @@ namespace SusurroFunctions.Model
             return result;
         }
 
+        internal static bool Logout(string name, string password)
+        {
+            var user = GetUser(name);
+            if (user == null) return false;
+            var result = PasswordOk(user, password);
+            if (result)
+            {
+                user.Add("ConnectionId", null);
+                var tableClient = TableClient();
+                tableClient.UpsertEntity(user);
+            }
+            return result;
+        }
+
         internal static TableClient TableClient()
         {
             var clientId = Environment.GetEnvironmentVariable("MI_CLIENT_ID");

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Susurro.Models;
 
 namespace Susurro.ViewModels
@@ -33,14 +35,99 @@ namespace Susurro.ViewModels
             }
         }
 
+        private string? _loginName;
+        private string? _createName;
+        private string? _loginPassword;
+        private string? _createPassword1;
+        private string? _createPassword2;
+        public bool PasswordsLocked { get; set; }
+        public string? LoginName
+        {
+            get { return _loginName; }
+            set
+            {
+                _loginName = value;
+                OnPropertyChanged(nameof(LoginName));
+            }
+        }
+
+        public string? CreateName
+        {
+            get { return _createName; }
+            set
+            {
+                _createName = value;
+                OnPropertyChanged(nameof(CreateName));
+            }
+        }
+
+        public string? LoginPassword
+        {
+            get { return _loginPassword; }
+            set
+            {
+                if (!PasswordsLocked)
+                {
+                    _loginPassword = value;
+                    OnPropertyChanged(nameof(LoginPassword));
+                }
+            }
+        }
+
+        public string? CreatePassword1
+        {
+            get { return _createPassword1; }
+            set
+            {
+                if (!PasswordsLocked)
+                {
+                    _createPassword1 = value;
+                    OnPropertyChanged(nameof(CreatePassword1));
+                }
+            }
+        }
+        public string? CreatePassword2
+        {
+            get { return _createPassword2; }
+            set
+            {
+                if (!PasswordsLocked)
+                {
+                    _createPassword2 = value;
+                    OnPropertyChanged(nameof(CreatePassword2));
+                }
+            }
+        }
+
+        private ObservableCollection<ChatVm> _chatVms;
+        private ICommand? _loginCommand;
+        private ICommand? _logoutCommand;
+        private string? _userName;
+        private int _selectedChatIndex;
+
         public ObservableCollection<ChatVm> ChatVms
         {
             get { return _chatVms; }
+            set { _chatVms = value; }
         }
 
-        private readonly ObservableCollection<ChatVm> _chatVms;
-        private string? _userName;
-        private int _selectedChatIndex;
+        public ICommand LoginCommand
+        {
+            get
+            {
+                _loginCommand ??= new RelayCommand(async (exec) => await LoginAsync());
+                return _loginCommand;
+            }
+        }
+
+        public ICommand LogoutCommand
+        {
+            get
+            {
+                _logoutCommand ??= new RelayCommand(async (exec0) => await LogoutAsync());
+                return _logoutCommand;
+            }
+        }
 
         private void OnPropertyChanged(string propertyName)
         {
@@ -52,16 +139,16 @@ namespace Susurro.ViewModels
         public MainWindowVm() 
         {
             _susurroMain = new SusurroMain();
-            _chatVms = [];
-            foreach (var chat in _susurroMain.Chats)
-            {                
-                ChatVms.Add(new ChatVm(chat));
-            }
-            SelectedChatIndex = 0;
+            ChatVms = [];
+            //foreach (var chat in _susurroMain.Chats)
+            //{                
+            //    ChatVms.Add(new ChatVm(chat));
+            //}
+            //SelectedChatIndex = 0;
             OnPropertyChanged(nameof(ChatVms));
             _susurroMain.LoginSuccess += LoginSuccess;
+            _susurroMain.LogoutSuccess += LogoutSuccess;
             _susurroMain.ChatAdded += ChatAdded;
-            //LoginAsync("dave", "P@ssw0rd4D@ve");
         }
 
         private void ChatAdded(object sender, ChatAddedEventArgs e)
@@ -72,14 +159,43 @@ namespace Susurro.ViewModels
             }));
         }
 
-        private async void LoginAsync(string username, string password)
-        {
-            await _susurroMain.LoginAsync(username, password);
-        }
-
         private void LoginSuccess(object? sender, EventArgs e)
         {
-            Username = _susurroMain?.Username;
+            Username = _susurroMain!.Username;
+            ClearLoginValues();
+            //foreach (var chat in _susurroMain!.Chats)
+            //{
+            //    ChatVms.Add(new ChatVm(chat));
+            //}
+            SelectedChatIndex = 0;
+        }
+
+        private void LogoutSuccess(object? sender, EventArgs e)
+        {
+            Username = null;
+            ClearLoginValues();
+            while (ChatVms.Count > 0)
+                ChatVms.Remove(ChatVms.First());
+        }
+
+        private void ClearLoginValues()
+        {
+            LoginName = null;
+            LoginPassword = null;
+            CreateName = null;
+            CreatePassword1 = null;
+            CreatePassword2 = null;
+        }
+
+        private async Task LoginAsync()
+        {
+            if (LoginName == null || LoginPassword == null) return;
+            await _susurroMain.LoginAsync(LoginName, LoginPassword);
+        }
+
+        private async Task LogoutAsync()
+        {
+            await _susurroMain.LogoutAsync();            
         }
     }
 }

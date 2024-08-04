@@ -1,28 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Susurro.Views.Controls
 {
-    /// <summary>
-    /// Interaction logic for ChatTabControl.xaml
-    /// </summary>
     public partial class LoginControl : UserControl
     {
         public LoginControl()
         {
             InitializeComponent();
+        }
+
+        private void LoginPwdBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            ((dynamic)this.DataContext).LoginPassword = ((PasswordBox)sender).Password;
+        }
+
+        private void CreatePwdBox1_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            ((dynamic)this.DataContext).CreatePassword1 = ((PasswordBox)sender).Password;
+        }
+
+        private void CreatePwdBox2_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            ((dynamic)this.DataContext).CreatePassword2 = ((PasswordBox)sender).Password;
+        }
+
+        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            ((dynamic)this.DataContext).PasswordsLocked = true;
+            LoginPwdBox.Password = null;
+            CreatePwdBox1.Password = null;
+            CreatePwdBox2.Password = null;
+            ((dynamic)this.DataContext).PasswordsLocked = false;
         }
     }
 }

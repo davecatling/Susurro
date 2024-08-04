@@ -44,7 +44,7 @@
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
-    <TabControl Grid.Row="1" ItemsSource="{Binding Path=ChatVms}" 
+    <TabControl Grid.Row="1" ItemsSource="{Binding Path=ChatVms, Mode=TwoWay}" 
             SelectedIndex="{Binding Path=SelectedChatIndex}" 
             ContentTemplate="{StaticResource tabTemplate}">
         <TabControl.ItemContainerStyle>

@@ -64,7 +64,7 @@
             return msg;
         }
 
-        public async Task<HttpResponseMessage> Login(string name, string password)
+        public async Task<HttpResponseMessage> LoginAsync(string name, string password)
         {
             HttpResponseMessage result;
             var requestMessage = new HttpRequestMessage
@@ -77,6 +77,20 @@
             HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64HeaderValue);
             result = await HttpClient.SendAsync(requestMessage);            
             return result;       
+        }
+
+        public async Task<HttpResponseMessage> LogoutAsync()
+        {
+            HttpResponseMessage result;
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{HttpClient.BaseAddress}Logout")
+            };
+            result = await HttpClient.SendAsync(requestMessage);
+            if (result.IsSuccessStatusCode)
+                HttpClient.DefaultRequestHeaders.Authorization = null;
+            return result;
         }
 
         public async Task<HttpResponseMessage> SendMsgAsync(List<MessageDto> messages)

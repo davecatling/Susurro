@@ -35,6 +35,11 @@ namespace SusurroSignalR
                 });
             }
         }
+
+        public async void DisconnectAsync()
+        {
+            await Connection.StopAsync();
+        }
     }
 
     public class MsgIdReceivedEventArgs(string id) : EventArgs

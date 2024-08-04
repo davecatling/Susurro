@@ -30,6 +30,7 @@ namespace Susurro.Models
         public delegate void ChatAddedEventHandler(object sender, ChatAddedEventArgs e);
         public event ChatAddedEventHandler? ChatAdded;
         public event EventHandler? LoginSuccess;
+        public event EventHandler? LogoutSuccess;
 
         public SusurroMain()
         {
@@ -39,8 +40,7 @@ namespace Susurro.Models
             _http = new Http();
             builder.Configuration.GetSection("Http").Bind(_http);
             _rsa = new Rsa(_http);
-            Chats = [];
-            AddNewChat();
+            Chats = [];            
         }
 
         private void AddNewChat()
@@ -59,15 +59,37 @@ namespace Susurro.Models
 
         public async Task LoginAsync (string name, string password)
         {
-            var result = await _http!.Login(name, password);
+            var result = await _http!.LoginAsync(name, password);
             if (result.IsSuccessStatusCode)
-            {
+            {                
                 _username = name;
                 _password = password;
                 _signalR = new SignalR(_http);
                 _signalR.ConnectAsync();
                 _signalR.MsgIdReceived += SignalRmsgIdReceived;
+                AddNewChat();
                 LoginSuccess?.Invoke(this, new EventArgs());
+            }
+            else
+            {
+                using var streamReader = new StreamReader(result.Content.ReadAsStream());
+                throw new Exception(streamReader.ReadToEnd());
+            }
+        }
+
+        public async Task LogoutAsync ()
+        {
+            var result = await _http!.LogoutAsync();
+            if (result.IsSuccessStatusCode && _signalR != null)
+            {
+                while (Chats?.Count > 1)
+                {
+                    if (Chats.First().Participants != null)
+                        Chats.Remove(Chats.First());
+                }
+                _signalR.DisconnectAsync();
+                _signalR.MsgIdReceived -= SignalRmsgIdReceived;
+                LogoutSuccess?.Invoke(this, new EventArgs());
             }
             else
             {

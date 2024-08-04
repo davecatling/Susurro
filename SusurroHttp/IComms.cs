@@ -10,6 +10,7 @@ namespace SusurroHttp
         Task<string> GetKeyAsync(string name);
         Task<HttpResponseMessage> PutConIdAsync(string conId);
         Task<HttpResponseMessage> PutKeyAsync(string key);
-        Task<HttpResponseMessage> Login(string name, string password);
+        Task<HttpResponseMessage> LoginAsync(string name, string password);
+        Task<HttpResponseMessage> LogoutAsync();
     }
 }
