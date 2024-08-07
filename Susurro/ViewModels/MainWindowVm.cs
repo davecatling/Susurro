@@ -196,24 +196,43 @@ namespace Susurro.ViewModels
 
         private async Task LoginAsync()
         {
-            if (LoginName == null || LoginPassword == null) return;
-            await _susurroMain.LoginAsync(LoginName, LoginPassword);
+            try
+            {
+                if (String.IsNullOrEmpty(LoginName) || String.IsNullOrEmpty(LoginPassword)) return;
+                await _susurroMain.LoginAsync(LoginName!, LoginPassword!);
+            }
+            catch (Exception ex)
+            {
+                DisplayError(ex.Message);
+            }
         }
 
         private async Task CreateUserAsync()
         {
-            if (CreateName == null || CreatePassword1 == null) return;
-            if (CreatePassword1 != CreatePassword2)
+            try
             {
-                MessageBox.Show("The provided passwords do not match.");
-                return;
+                if (CreateName == null || CreatePassword1 == null) return;
+                if (CreatePassword1 != CreatePassword2)
+                {
+                    DisplayError("The provided passwords do not match.");
+                    return;
+                }
+                await _susurroMain.CreateUserAsync(CreateName, CreatePassword1);
             }
-            await _susurroMain.CreateUserAsync(CreateName, CreatePassword1);
+            catch (Exception ex)
+            {
+                DisplayError(ex.Message);
+            }
         }
 
         private async Task LogoutAsync()
         {
             await _susurroMain.LogoutAsync();            
+        }
+
+        private static void DisplayError(string message)
+        {
+            MessageBox.Show(message, "Susurro", MessageBoxButton.OK);
         }
     }
 }

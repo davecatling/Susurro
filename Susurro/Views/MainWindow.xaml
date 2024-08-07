@@ -23,8 +23,8 @@
                     Visibility="{Binding Path=Username, Converter={StaticResource NameToChatsConverter}}">
                 Logout
             </Button>
-            <Label Content="Hello" Padding="0,0,2,0" FontWeight="Bold"/>
-            <TextBlock Text="{Binding Path=Username}"/>            
+            <Label Margin="5,0,0,0" Content="Hello" Padding="0,0,2,0" FontWeight="Bold"/>
+            <TextBlock Margin="3,0,0,0" Text="{Binding Path=Username}"/>            
         </DockPanel>
         <controls:ChatTabControl Grid.Row="1" Visibility="{Binding Path=Username, 
             Converter={StaticResource NameToChatsConverter}}"/>

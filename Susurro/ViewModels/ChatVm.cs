@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Susurro.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
-using Susurro.Models;
 
 namespace Susurro.ViewModels
 {
@@ -131,20 +126,39 @@ namespace Susurro.ViewModels
 
         private void AddParticipant()
         {
-            if (NewParticipant != null)
+            if (!String.IsNullOrEmpty(NewParticipant))
             {
-                _chat.AddParticipant(NewParticipant);
-                NewParticipant = null;
-            }
+                try
+                {
+                    _chat.AddParticipant(NewParticipant);
+                    NewParticipant = null;
+                }
+                catch (Exception ex)
+                {
+                    DisplayError(ex.Message);
+                }
+            }            
         }
 
         private async void SendMessageAsync()
         {
-            if (PlainText != null)
+            if (!String.IsNullOrEmpty(PlainText))
             {
-                await _chat.SendMessageAsync(PlainText);
-                PlainText = null;
+                try
+                {
+                    await _chat.SendMessageAsync(PlainText);
+                    PlainText = null;
+                }
+                catch (Exception ex)
+                {
+                    DisplayError(ex.Message);
+                }
             }
+        }
+
+        private static void DisplayError(string message)
+        {
+            MessageBox.Show(message, "Susurro", MessageBoxButton.OK);
         }
     }
 }

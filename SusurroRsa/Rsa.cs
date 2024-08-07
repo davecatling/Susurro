@@ -74,7 +74,7 @@ namespace SusurroRsa
                 publicKeyXml = await _http.GetKeyAsync(username);
                 using StreamWriter streamWriter = new(File.Open(path, FileMode.Create));
                 streamWriter.Write(publicKeyXml);
-            }
+            }           
             var cryptoServiceProvider = NewServiceProvider();
             cryptoServiceProvider.FromXmlString(publicKeyXml);
             return cryptoServiceProvider;

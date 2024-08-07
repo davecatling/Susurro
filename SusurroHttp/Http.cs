@@ -40,7 +40,11 @@
             }
             catch (HttpRequestException ex) 
             {
-                result = ex.Message;
+                if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    throw new Exception($"User {name} not found");
+                }
+                throw new Exception(ex.Message);
             }
             return result;
         }
