@@ -44,15 +44,22 @@ namespace Susurro.Models
             MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
         }
 
-        public void AddParticipant(string participant)
+        public void AddParticipants(string participants)
         {
-            if (_participants.Count < 6)
-            {
-                _participants.Add(participant);
-                ParticipantAdded?.Invoke(this, new ParticipantAddedEventArgs(participant));
-            }
+            var newParticipants = participants.Trim().Split(' ');
+            if ((_participants.Count + newParticipants.Length) > 6)
+                throw new InvalidOperationException("Maximum chat participants is six");
             else
-                throw new InvalidOperationException("Maximum chat participants reached");
+            {
+                var i = 0;
+                while ((_participants.Count < 6) && (i < newParticipants.Length)) 
+                {
+                    _participants.Add(newParticipants[i]);
+                    ParticipantAdded?.Invoke(this, 
+                        new ParticipantAddedEventArgs(newParticipants[i]));
+                    i++;
+                }
+            }
         }
         
         public async Task SendMessageAsync(string plainText)

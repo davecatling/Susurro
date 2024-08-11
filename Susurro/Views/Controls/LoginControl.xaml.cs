@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace Susurro.Views.Controls
 {
@@ -41,6 +42,26 @@ namespace Susurro.Views.Controls
         private void CreateUserButton_Click(object sender, RoutedEventArgs e)
         {
             ClearPasswords();
+        }
+
+        private void LoginPwdBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                LoginButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+                var vm = (dynamic)this.DataContext;
+                vm.LoginCommand.Execute(null);
+            }
+        }
+
+        private void CreatePwdBox2_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                CreateUserButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+                var vm = (dynamic)this.DataContext;
+                vm.CreateUserCommand.Execute(null);
+            }
         }
     }
 }

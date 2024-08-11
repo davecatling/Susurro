@@ -181,7 +181,7 @@ namespace Susurro.Models
                 var chat = Chats.FirstOrDefault(c => c.Participants == null);
                 if (chat != null)
                 {
-                    requiredParticipants.ForEach(p => chat.AddParticipant(p));
+                    requiredParticipants.ForEach(p => chat.AddParticipants(p));
                     chat.AddMessage(message);
                 }
             }

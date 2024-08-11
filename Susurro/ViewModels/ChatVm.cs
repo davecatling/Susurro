@@ -13,7 +13,7 @@ namespace Susurro.ViewModels
 
         private readonly Chat _chat;
         private string? _participants;
-        private string? _newParticipant;
+        private string? _newParticipants;
         private string? _plainText;
         private int _unreadCount;
         private bool _selected;
@@ -27,13 +27,13 @@ namespace Susurro.ViewModels
             _chat.ParticipantAdded += ParticipantAdded;
         }
 
-        public string? NewParticipant
+        public string? NewParticipants
         {
-            get => _newParticipant;
+            get => _newParticipants;
             set
             {
-                _newParticipant = value;
-                OnPropertyChanged(nameof(NewParticipant));
+                _newParticipants = value;
+                OnPropertyChanged(nameof(NewParticipants));
             }
         }
 
@@ -51,7 +51,7 @@ namespace Susurro.ViewModels
         {
             get
             {
-                _addParticipantCommand ??= new RelayCommand((exec) => AddParticipant());
+                _addParticipantCommand ??= new RelayCommand((exec) => AddParticipants());
                 return _addParticipantCommand;
             }
         }
@@ -124,14 +124,14 @@ namespace Susurro.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void AddParticipant()
+        private void AddParticipants()
         {
-            if (!String.IsNullOrEmpty(NewParticipant))
+            if (!String.IsNullOrEmpty(NewParticipants))
             {
                 try
                 {
-                    _chat.AddParticipant(NewParticipant);
-                    NewParticipant = null;
+                    _chat.AddParticipants(NewParticipants);
+                    NewParticipants = null;
                 }
                 catch (Exception ex)
                 {

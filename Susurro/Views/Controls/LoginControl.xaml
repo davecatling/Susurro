@@ -31,13 +31,13 @@
                  VerticalContentAlignment="Center" Text="{Binding Path=CreateName, Mode=TwoWay}"></TextBox>
         <Label Grid.Column="0" Grid.Row="2" VerticalAlignment="Center">Password:</Label>
         <PasswordBox Grid.Column="1" Grid.Row="2" MinWidth="50" MaxHeight="30" x:Name="LoginPwdBox" TabIndex="1"
-                 VerticalContentAlignment="Center" PasswordChanged="LoginPwdBox_PasswordChanged"></PasswordBox>
+                 VerticalContentAlignment="Center" PasswordChanged="LoginPwdBox_PasswordChanged" KeyDown="LoginPwdBox_KeyDown"></PasswordBox>
         <Label Grid.Column="3" Grid.Row="2" VerticalAlignment="Center" Margin="5,0,0,0">Password</Label>
         <PasswordBox Grid.Column="4" Grid.Row="2" MinWidth="50" MaxHeight="30" x:Name="CreatePwdBox1" TabIndex="4"
                  VerticalContentAlignment="Center" PasswordChanged="CreatePwdBox1_PasswordChanged"></PasswordBox>
         <Label Grid.Column="3" Grid.Row="3" VerticalAlignment="Center" Margin="5,0,0,0">Confirm Password</Label>
         <PasswordBox Grid.Column="4" Grid.Row="3" MinWidth="50" MaxHeight="30" Name="CreatePwdBox2" TabIndex="5"
-                 VerticalContentAlignment="Center" PasswordChanged="CreatePwdBox2_PasswordChanged"></PasswordBox>
+                 VerticalContentAlignment="Center" PasswordChanged="CreatePwdBox2_PasswordChanged" KeyDown="CreatePwdBox2_KeyDown"></PasswordBox>
         <Button x:Name="LoginButton" Grid.Column="0" Grid.Row="4" Padding="5" Margin="5" TabIndex="2" Command="{Binding Path=LoginCommand}"
                 Grid.ColumnSpan="2" HorizontalAlignment="Center" Click="LoginButton_Click">Login</Button>
         <Button x:Name="CreateUserButton" Grid.Column="3" Grid.Row="4" Padding="5" Margin="5" TabIndex="6" Command="{Binding Path=CreateUserCommand}"

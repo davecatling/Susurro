@@ -8,7 +8,8 @@
         xmlns:controls="clr-namespace:Susurro.Views.Controls"
         xmlns:converters="clr-namespace:Susurro.Views.Converters"
         mc:Ignorable="d"
-        Title="Susurro" Height="450" Width="800">
+        Title="Susurro" Height="450" Width="800"
+        Icon="pack://application:,,,/Susurro;component/Susurro.png">
     <Window.Resources>
         <converters:UsernametoChatsVis x:Key="NameToChatsConverter"/>
         <converters:UsernametoLoginVis x:Key="NameToLoginConverter"/>
