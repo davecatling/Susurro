@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Susurro.Views.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded">
     <Grid Margin="10" MaxHeight="600" VerticalAlignment="Center">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width=".5*" MaxWidth="100"/>
@@ -24,7 +24,7 @@
         <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">Login</Label>
         <Label Grid.Column="3" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">New User</Label>
         <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Username:</Label>
-        <TextBox Grid.Column="1" Grid.Row="1" MinWidth="50" MaxHeight="30" TabIndex="0"
+        <TextBox x:Name="LoginNameTextbox" Grid.Column="1" Grid.Row="1" MinWidth="50" MaxHeight="30" TabIndex="0"
                  VerticalContentAlignment="Center" Text="{Binding Path=LoginName, Mode=TwoWay}"></TextBox>
         <Label Grid.Column="3" Grid.Row="1" VerticalAlignment="Center" Margin="5,0,0,0">Username</Label>
         <TextBox Grid.Column="4" Grid.Row="1" MinWidth="50" MaxHeight="30" TabIndex="3"

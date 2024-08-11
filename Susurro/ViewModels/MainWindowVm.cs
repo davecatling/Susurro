@@ -1,25 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Susurro.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Susurro.Models;
 
 namespace Susurro.ViewModels
 {
     public class MainWindowVm : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
         
+        private ObservableCollection<ChatVm>? _chatVms;
+        private ICommand? _loginCommand;
+        private ICommand? _logoutCommand;
+        private ICommand? _createUserCommand;
+        private string? _userName;
+        private int _selectedChatIndex;
+        private string? _loginName;
+        private string? _createName;
+        private string? _loginPassword;
+        private string? _createPassword1;
+        private string? _createPassword2;
+        private string? _statusText;
+        private System.Timers.Timer _statusUpdateTimer;
+
+        public bool PasswordsLocked { get; set; }
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public string? Username
         {
             get { return _userName; }
-            private set { _userName = value;
+            private set
+            {
+                _userName = value;
                 OnPropertyChanged(nameof(Username));
             }
         }
@@ -27,21 +39,14 @@ namespace Susurro.ViewModels
         public int SelectedChatIndex
         {
             get { return _selectedChatIndex; }
-            set 
-            { 
+            set
+            {
                 _selectedChatIndex = value;
-                for (int i = 0; i < ChatVms.Count; i++)
+                for (int i = 0; i < ChatVms!.Count; i++)
                     ChatVms[i].Selected = (_selectedChatIndex == i);
                 OnPropertyChanged(nameof(SelectedChatIndex));
             }
         }
-
-        private string? _loginName;
-        private string? _createName;
-        private string? _loginPassword;
-        private string? _createPassword1;
-        private string? _createPassword2;
-        public bool PasswordsLocked { get; set; }
         public string? LoginName
         {
             get { return _loginName; }
@@ -59,6 +64,20 @@ namespace Susurro.ViewModels
             {
                 _createName = value;
                 OnPropertyChanged(nameof(CreateName));
+            }
+        }
+
+        public string? StatusText
+        {
+            get { return _statusText; }
+            private set
+            {
+                _statusText = value;
+                if (_statusText != null && _statusText.EndsWith('.'))
+                    _statusUpdateTimer.Start();
+                else
+                    _statusUpdateTimer.Stop();
+                OnPropertyChanged(nameof(StatusText));
             }
         }
 
@@ -98,14 +117,7 @@ namespace Susurro.ViewModels
                     OnPropertyChanged(nameof(CreatePassword2));
                 }
             }
-        }
-
-        private ObservableCollection<ChatVm>? _chatVms;
-        private ICommand? _loginCommand;
-        private ICommand? _logoutCommand;
-        private ICommand? _createUserCommand;
-        private string? _userName;
-        private int _selectedChatIndex;
+        }        
 
         public ObservableCollection<ChatVm>? ChatVms
         {
@@ -155,13 +167,32 @@ namespace Susurro.ViewModels
             _susurroMain.LoginSuccess += LoginSuccess;
             _susurroMain.LogoutSuccess += LogoutSuccess;
             _susurroMain.ChatAdded += ChatAdded;
+            _statusUpdateTimer = new System.Timers.Timer(1000);
+            _statusUpdateTimer.Elapsed += StatusUpdateTimer_Elapsed;
+        }
+
+        private void StatusUpdateTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (StatusText == null || !StatusText.EndsWith('.'))
+            {
+                _statusUpdateTimer?.Stop();
+                return;
+            }
+            var dotPos = StatusText.IndexOf('.');
+            var baseText = StatusText[..dotPos];
+            StatusText = (StatusText.Length - dotPos) switch
+            {
+                1 => $"{baseText}..",
+                2 => $"{baseText}...",
+                _ => $"{baseText}.",
+            };
         }
 
         private void ChatAdded(object sender, ChatAddedEventArgs e)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
+            Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                ChatVms.Add(new ChatVm(e.Chat));
+                ChatVms!.Add(new ChatVm(e.Chat));
             }));
         }
 
@@ -169,19 +200,20 @@ namespace Susurro.ViewModels
         {
             Username = _susurroMain!.Username;
             ClearLoginValues();
-            _chatVms.Clear();
+            _chatVms!.Clear();
             foreach (var chat in _susurroMain!.Chats)
             {
-                ChatVms.Add(new ChatVm(chat));
+                ChatVms!.Add(new ChatVm(chat));
             }
             SelectedChatIndex = 0;
+            StatusText = null;
         }
 
         private void LogoutSuccess(object? sender, EventArgs e)
         {
             Username = null;
             ClearLoginValues();
-            while (ChatVms.Count > 0)
+            while (ChatVms!.Count > 0)
                 ChatVms.Remove(ChatVms.First());
         }
 
@@ -199,10 +231,12 @@ namespace Susurro.ViewModels
             try
             {
                 if (String.IsNullOrEmpty(LoginName) || String.IsNullOrEmpty(LoginPassword)) return;
+                StatusText = "Logging in.";
                 await _susurroMain.LoginAsync(LoginName!, LoginPassword!);
             }
             catch (Exception ex)
             {
+                StatusText = null;
                 DisplayError(ex.Message);
             }
         }

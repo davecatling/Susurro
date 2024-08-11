@@ -63,5 +63,10 @@ namespace Susurro.Views.Controls
                 vm.CreateUserCommand.Execute(null);
             }
         }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoginNameTextbox.Focus();
+        }
     }
 }

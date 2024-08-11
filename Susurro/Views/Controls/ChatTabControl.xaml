@@ -15,11 +15,11 @@
                     <RowDefinition MaxHeight="25"/>
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" Margin="5,5,5,0">
-                    <Button DockPanel.Dock="Right" Width="50" Margin="5,0,5,0" TabIndex="3"
+                    <Button DockPanel.Dock="Right" Width="50" Margin="5,0,5,0" TabIndex="4"
                     Command="{Binding Path=AddParticipantCommand}">
                         Add
                     </Button>
-                    <TextBox MinWidth="50" TabIndex="2" Text="{Binding Path=NewParticipants, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox MinWidth="50" TabIndex="3" Text="{Binding Path=NewParticipants, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding Path=AddParticipantCommand}" Key="Return"></KeyBinding>
                         </TextBox.InputBindings>
@@ -39,11 +39,11 @@
                     </ItemsControl>
                 </ScrollViewer>
                 <DockPanel Grid.Row="2" Margin="5,0,5,5">
-                    <Button DockPanel.Dock="Right" Width="50" Margin="5,0,5,0" TabIndex="1"
+                    <Button DockPanel.Dock="Right" Width="50" Margin="5,0,5,0" TabIndex="2"
                     Command="{Binding Path=SendMessageCommand}">
                         Send
                     </Button>
-                    <TextBox MinWidth="50" TabIndex="0" Text="{Binding Path=PlainText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox MinWidth="50" TabIndex="1" Text="{Binding Path=PlainText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding Path=SendMessageCommand}" Key="Return"></KeyBinding>
                         </TextBox.InputBindings>
@@ -53,7 +53,7 @@
         </DataTemplate>
     </UserControl.Resources>
     <TabControl x:Name="ChatTab" Grid.Row="1" ItemsSource="{Binding Path=ChatVms, Mode=TwoWay}" 
-            SelectedIndex="{Binding Path=SelectedChatIndex}" 
+            SelectedIndex="{Binding Path=SelectedChatIndex}"
             ContentTemplate="{StaticResource tabTemplate}">
         <TabControl.ItemContainerStyle>
             <Style TargetType="TabItem">

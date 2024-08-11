@@ -25,7 +25,8 @@
                 Logout
             </Button>
             <Label Margin="5,0,0,0" Content="Hello" Padding="0,0,2,0" FontWeight="Bold"/>
-            <TextBlock Margin="3,0,0,0" Text="{Binding Path=Username}"/>            
+            <TextBlock Margin="3,0,0,0" Text="{Binding Path=Username}"/>
+            <TextBlock Margin="20,0,0,0" Text="{Binding Path=StatusText}"/>
         </DockPanel>
         <controls:ChatTabControl Grid.Row="1" Visibility="{Binding Path=Username, 
             Converter={StaticResource NameToChatsConverter}}"/>
