@@ -98,6 +98,18 @@ namespace SusurroFunctions.Model
             return queryResults.First();
         }
 
+        internal static List<string> GetMsgIds(string name)
+        {
+            var result = new List<MessageEntity>();
+            var tableClient = TableClient();
+            Pageable<MessageEntity> queryResults = tableClient.Query<MessageEntity>(filter: (e) =>
+                e.PartitionKey == "msgs" && e.To == name);
+            result.AddRange([.. queryResults]);
+            if (result.Count != 0)
+                return result.OrderBy((m) => m.Timestamp).Select((m) => m.RowKey).ToList();
+            return [];
+        }
+
         internal static void DeleteMsg(string id)
         {            
             var tableClient = TableClient();
