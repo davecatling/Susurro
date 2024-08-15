@@ -25,7 +25,10 @@ namespace SusurroFunctions
             await Task.Run(() => { result = TableOperations.Login(userDetails.Name, 
                 userDetails.Password); });
             if (result)
-                return new OkObjectResult($"User {userDetails.Name} logged in.");
+            {
+                var msgIds = TableOperations.GetMsgIds(userDetails.Name);
+                return new OkObjectResult(msgIds);
+            }
             else
                 return new BadRequestObjectResult($"Login for user {userDetails.Name} failed. " +
                     $"Login for {userDetails.Name} will be unavailable for one minute.");            

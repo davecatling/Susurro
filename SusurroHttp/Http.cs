@@ -68,7 +68,7 @@
             return msg;
         }
 
-        public async Task<HttpResponseMessage> LoginAsync(string name, string password)
+        public async Task<List<string>> LoginAsync(string name, string password)
         {
             HttpResponseMessage result;
             var requestMessage = new HttpRequestMessage
@@ -79,8 +79,14 @@
             var base64HeaderValue = Convert.ToBase64String(Encoding.ASCII.GetBytes(
                 $"{name}:{password}"));
             HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64HeaderValue);
-            result = await HttpClient.SendAsync(requestMessage);            
-            return result;       
+            result = await HttpClient.SendAsync(requestMessage);
+            if (!result.IsSuccessStatusCode)
+            {
+                using var streamReader = new StreamReader(result.Content.ReadAsStream());
+                throw new Exception(streamReader.ReadToEnd());
+            }
+            var ids = await result.Content.ReadFromJsonAsync<List<string>>();
+            return ids ?? [];       
         }
 
         public async Task<HttpResponseMessage> LogoutAsync()

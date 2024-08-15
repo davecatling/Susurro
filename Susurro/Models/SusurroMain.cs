@@ -59,21 +59,20 @@ namespace Susurro.Models
 
         public async Task LoginAsync (string name, string password)
         {
-            var result = await _http!.LoginAsync(name, password);
-            if (result.IsSuccessStatusCode)
-            {                
-                _username = name;
-                _password = password;
-                _signalR = new SignalR(_http);
-                _signalR.ConnectAsync();
-                _signalR.MsgIdReceived += SignalRmsgIdReceived;
-                AddNewChat();
-                LoginSuccess?.Invoke(this, new EventArgs());
-            }
-            else
+            var result = await _http!.LoginAsync(name, password);                
+            _username = name;
+            _password = password;
+            _signalR = new SignalR(_http);
+            _signalR.ConnectAsync();
+            _signalR.MsgIdReceived += SignalRmsgIdReceived;
+            AddNewChat();
+            LoginSuccess?.Invoke(this, new EventArgs());
+            if (result.Count != 0)
             {
-                using var streamReader = new StreamReader(result.Content.ReadAsStream());
-                throw new Exception(streamReader.ReadToEnd());
+                foreach (var msg in result)
+                {
+                    SignalRmsgIdReceived(this, new MsgIdReceivedEventArgs(msg));
+                }
             }
         }
 
