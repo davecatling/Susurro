@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Xml.Linq;
 using SusurroDtos;
+using System.Windows;
 
 namespace Susurro.Models
 {
@@ -145,14 +146,27 @@ namespace Susurro.Models
         {
             if (_username == null || _password == null) return;
             var message = await GetMessageAsync(e.Id);
+            if (message == null) return;
             AddMessageToChat(message);
         }
 
-        private async Task<Message> GetMessageAsync(string id)
+        private async Task<Message?> GetMessageAsync(string id)
         {
-            var messageDto = await _http.GetMsgAsync(id);
-            var plainText = Rsa.Decrypt(messageDto.Text, _username!, _password!);
-            return new Message(messageDto, plainText);
+            try
+            {
+                var messageDto = await _http.GetMsgAsync(id);
+                var plainText = Rsa.Decrypt(messageDto.Text, _username!, _password!);
+                var signatureOk = await new Rsa(_http!).SignatureOkAsync(messageDto.Signature,
+                    plainText, messageDto.From);
+                if (!signatureOk)
+                    throw new Exception("Message signature check failed!");
+                return new Message(messageDto, plainText);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Susurro", MessageBoxButton.OK);
+                return null;
+            }
         }
 
         private void AddMessageToChat(Message message)

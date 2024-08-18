@@ -24,7 +24,7 @@ namespace SusurroFunctions.Model
         public static bool Complexity(string password)
         {
             if (password == null) return false;
-            if (password.Length < 8) return false;
+            if (password.Length < 12) return false;
             var regex = SpecialChars();
             if (!regex.IsMatch(password)) return false;
             regex = LowerCaseChars();

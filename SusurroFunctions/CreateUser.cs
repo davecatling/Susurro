@@ -33,11 +33,11 @@ namespace SusurroFunctions
                 if (TableOperations.UserExists(userDto.Name))
                     return new BadRequestObjectResult($"Username {userDto.Name} is not available");
                 if (!PasswordChecker.Complexity(userDto.Password))
-                    errorMsg.AppendLine("Passwords must have at least eight characters, no spaces, " +
+                    errorMsg.AppendLine("Passwords must have at least 12 characters, no spaces, " +
                         "a mix of upper and lowercase characters, special characters and numbers.");
                 var hibpCount = await PasswordChecker.HibpCount(userDto.Password);
                 if (hibpCount != 0)
-                    errorMsg.AppendLine($"Your password appears {hibpCount} time{(hibpCount > 1 ? "s" : "")} " +
+                    errorMsg.AppendLine($"That password cannot be used as it appears {hibpCount} time{(hibpCount > 1 ? "s" : "")} " +
                         $"in the Have I Been Pwned database of known breaches.");
                 if (errorMsg.ToString().Length > 0)
                     return new BadRequestObjectResult($"{errorMsg.ToString().Trim()}");

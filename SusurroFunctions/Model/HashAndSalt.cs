@@ -19,7 +19,7 @@ namespace SusurroFunctions.Model
         {
             var passWord = Encoding.UTF8.GetBytes(password);
             var saltedValue = passWord.Concat(salt).ToArray();
-            return SHA256.HashData(saltedValue);
+            return SHA512.HashData(saltedValue);
         }
     }
 }
