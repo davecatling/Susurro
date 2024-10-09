@@ -3,4 +3,4 @@ Susurro is a small Windows desktop application for anonymous end to end encrypte
 
 An (intentionally unsigned) ClickOnce application installer can be accessed here: https://susurrostorage.blob.core.windows.net/deployment/Publish.html
 
-A video demo using the front end which formed part of my uni submission can be viewed here: https://susurrostorage.blob.core.windows.net/deployment/ZZEN9209 – Security Engineering Capstone.mp4
+A video demo using the front end which formed part of my uni submission can be viewed here: [https://susurrostorage.blob.core.windows.net/deployment/ZZEN9209 – Security Engineering Capstone.mp4](https://susurrostorage.blob.core.windows.net/deployment/ZZEN9209.mp4)
